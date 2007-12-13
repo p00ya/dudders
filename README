@@ -1,0 +1,67 @@
+dudders README
+==============
+
+Users
+-----
+
+Dudders is a utility for updating DNS records.
+
+Dudders spells "DHCP Updating DNS Duly Embracing RSA SIG(0)" (with
+some poetic license).  It points a domain name to a given IP address,
+using the RFC2136 DNS UPDATE protocol and a SIG(0) signature.  It is
+designed with embedded systems in mind.  This has several implications
+for users:
+
+ - you can't use it to do all the things DNS UPDATE can do,
+ - it will error and exit rather than dealing with problems;
+ - it will fit and work on your embedded device!
+
+For a general purpose DNS UPDATE utility, use ISC's nsupdate, which is
+distributed with BIND.  Free clients for protocols with similar
+functionality include ddclient, dyndns-client, ez-ipupdate and
+ipupdate.
+
+The ISC BIND 9 Administrator Reference Manual contains instructions
+for configuring your zone's DNS server to support a SIG(0) update,
+under the DNSSEC section.
+
+For instructions on how to invoke the program, consult the dudders(1)
+manual page which is built by configure.
+
+License
+-------
+
+Dudders is licensed under the Apache License, Version 2.0, the text of
+which is included in the file COPYING.
+
+Installation
+------------
+
+A POSIX-like standard C library is expected, complete with resolver.
+The BSD, uClibc, and glibc libraries should all work.
+
+An external libarary is required by dudders for cryptography.
+The following crypto libraries are supported:
+ - openssl: The OpenSSL project's libcrypto
+ - gcrypt: The GnuPG spinoff crypto library libgcrypt
+
+By default the `configure' shell script will try and guess which to
+use.  You can override this by calling configure with:
+
+  --with-crypto=CRYPTO
+
+Where CRYPTO is "openssl" or "gcrypt".
+
+By default, the program is built with a considerable amount of
+debugging information.  To make it leaner, call configure with:
+
+  CFLAGS="-DNDEBUG -O2"
+
+Consult the INSTALL file for additional instructions on building and
+installing dudders.
+
+Contact
+-------
+
+General discussion should take place on the mailing list:
+<dudders-users@lists.sourceforge.net>

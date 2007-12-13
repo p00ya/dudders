@@ -1,0 +1,133 @@
+../crypt_openssl.o ../crypt_openssl.o: ../crypt_openssl.c ../config.h \
+  /usr/include/assert.h /usr/include/sys/cdefs.h \
+  /usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stdint.h \
+  /sw/include/openssl/bn.h /sw/include/openssl/e_os2.h \
+  /sw/include/openssl/opensslconf.h /usr/include/stdio.h \
+  /usr/include/_types.h /usr/include/sys/_types.h \
+  /usr/include/machine/_types.h /usr/include/i386/_types.h \
+  /sw/include/openssl/err.h /usr/include/stdlib.h /usr/include/sys/wait.h \
+  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
+  /usr/include/machine/signal.h /usr/include/i386/signal.h \
+  /usr/include/sys/resource.h /usr/include/machine/endian.h \
+  /usr/include/i386/endian.h /usr/include/sys/_endian.h \
+  /usr/include/libkern/OSByteOrder.h \
+  /usr/include/libkern/i386/OSByteOrder.h /usr/include/alloca.h \
+  /usr/include/machine/types.h /usr/include/i386/types.h \
+  /sw/include/openssl/bio.h \
+  /usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stdarg.h \
+  /sw/include/openssl/crypto.h /sw/include/openssl/stack.h \
+  /sw/include/openssl/safestack.h /sw/include/openssl/opensslv.h \
+  /sw/include/openssl/symhacks.h /sw/include/openssl/lhash.h \
+  /usr/include/errno.h /usr/include/sys/errno.h /sw/include/openssl/md5.h \
+  /sw/include/openssl/objects.h /sw/include/openssl/obj_mac.h \
+  /sw/include/openssl/asn1.h /usr/include/time.h \
+  /usr/include/machine/_limits.h /usr/include/i386/_limits.h \
+  /sw/include/openssl/ossl_typ.h /sw/include/openssl/rsa.h ../hope.h \
+  ../config.h ../parse_pk.h ../config.h /usr/include/string.h \
+  /usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stddef.h
+
+../config.h:
+
+/usr/include/assert.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stdint.h:
+
+/sw/include/openssl/bn.h:
+
+/sw/include/openssl/e_os2.h:
+
+/sw/include/openssl/opensslconf.h:
+
+/usr/include/stdio.h:
+
+/usr/include/_types.h:
+
+/usr/include/sys/_types.h:
+
+/usr/include/machine/_types.h:
+
+/usr/include/i386/_types.h:
+
+/sw/include/openssl/err.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/sys/wait.h:
+
+/usr/include/sys/signal.h:
+
+/usr/include/sys/appleapiopts.h:
+
+/usr/include/machine/signal.h:
+
+/usr/include/i386/signal.h:
+
+/usr/include/sys/resource.h:
+
+/usr/include/machine/endian.h:
+
+/usr/include/i386/endian.h:
+
+/usr/include/sys/_endian.h:
+
+/usr/include/libkern/OSByteOrder.h:
+
+/usr/include/libkern/i386/OSByteOrder.h:
+
+/usr/include/alloca.h:
+
+/usr/include/machine/types.h:
+
+/usr/include/i386/types.h:
+
+/sw/include/openssl/bio.h:
+
+/usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stdarg.h:
+
+/sw/include/openssl/crypto.h:
+
+/sw/include/openssl/stack.h:
+
+/sw/include/openssl/safestack.h:
+
+/sw/include/openssl/opensslv.h:
+
+/sw/include/openssl/symhacks.h:
+
+/sw/include/openssl/lhash.h:
+
+/usr/include/errno.h:
+
+/usr/include/sys/errno.h:
+
+/sw/include/openssl/md5.h:
+
+/sw/include/openssl/objects.h:
+
+/sw/include/openssl/obj_mac.h:
+
+/sw/include/openssl/asn1.h:
+
+/usr/include/time.h:
+
+/usr/include/machine/_limits.h:
+
+/usr/include/i386/_limits.h:
+
+/sw/include/openssl/ossl_typ.h:
+
+/sw/include/openssl/rsa.h:
+
+../hope.h:
+
+../config.h:
+
+../parse_pk.h:
+
+../config.h:
+
+/usr/include/string.h:
+
+/usr/lib/gcc/i686-apple-darwin8/4.0.1/include/stddef.h:

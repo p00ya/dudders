@@ -1,0 +1,36 @@
+Using libresolv
+===============
+
+The resolver library would be convenient to use if it worked.
+However, it's not particularly reliable.  uClibc is missing functions,
+and some options are not implemented under any of the standard
+libraries surveyed.
+
+Furthermore, it is customary for the standard functions to be macros
+and/or prototype-only.  Therefore it's not possible to check for just
+their symbols or just their declarations.  Furthermore on at least one
+system (OS X 10.4) the manual page states they can be linked with just
+libc, when libresolv is needed too.
+
+---------------  --------- -------- --------
+Feature          uClibc    glibc    OS X/BSD
+---------------  --------- -------- --------
+res_querydomain  Yes       Yes      No
+res_mkquery      No        Yes[1]   Yes[1]
+res_send         No        Yes      Yes[2]
+dn_expand        Yes       Yes      Yes
+dn_skipname      No        Yes      Yes
+res_query[3]     Yes       Yes      Yes
+ns_put16         No        No       Yes
+ns_put32         No        No       Yes
+ns_get16         No        Yes      Yes
+---------------  --------- -------- --------
+
+[1] 7th parameter newrr for updates not implemented
+
+[2] RES_PRIMARY option not supported in BSD.
+
+[3] The handling of authority-only responses varies.  On OS X, h_errno
+is NO_DATA.  In uClibc, h_errno is TRY_AGAIN.  However, both write the
+response packet into the buffer under these circumstances (although
+there's no documented guarantee of such behaviour).
