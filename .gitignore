@@ -1,0 +1,15 @@
+.deps
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.*
+configure
+dudders
+dudders.1
+scripts/*
+stamp-h1
+tests/test-crypt
+tests/test-decode64
+tests/test-parse_pk
+tests/test-sign_query
