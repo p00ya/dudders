@@ -17,9 +17,9 @@ for users:
  - it will fit and work on your embedded device!
 
 For a general purpose DNS UPDATE utility, use ISC's nsupdate, which is
-distributed with BIND.  Free clients for protocols with similar
-functionality include ddclient, dyndns-client, ez-ipupdate and
-ipupdate.
+distributed with BIND.  Other free clients with similar functionality
+include ddclient, ez-ipupdate, updatedd, ipupdate, and dnssec-tools's
+ifup-dyndns.
 
 The ISC BIND 9 Administrator Reference Manual contains instructions
 for configuring your zone's DNS server to support a SIG(0) update,
