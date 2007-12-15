@@ -36,6 +36,23 @@
 
 #include "hope.h"
 
+/* Check that the `dn_skipname' or `dn_expand' return value `dnlen' is
+ * okay, and that it is followed by a SOA IN identifier.  Returns a
+ * pointer to after the SOA/IN identifiers if they were present, or
+ * NULL. */
+static const unsigned char *
+check_dn_soa(int dnlen, const unsigned char *dn, const unsigned char *eom)
+{
+	hope(0 < dnlen, strerror(errno));
+	hope(dn + dnlen + 4 < eom, "SOA response ended prematurely");
+	if (ns_t_soa != ns_get16(dn + dnlen))
+		return NULL;
+	if (ns_c_in != ns_get16(dn + dnlen + 2))
+		return NULL;
+	return dn + 4 + dnlen;
+}
+
+// See dnssoa.h
 void
 dnssoa_parse(char *zone, char *mname,
     const unsigned char *response, size_t rlen)
@@ -50,7 +67,7 @@ dnssoa_parse(char *zone, char *mname,
 	uint16_t flags = ns_get16(response + 2);
 	if (0x8000 != (flags & 0xf80f))
 		return; // not looking at a response
-	
+
 	uint16_t question_count = ns_get16(response + 4);
 	uint16_t response_count = ns_get16(response + 6);
 	uint16_t authority_count = ns_get16(response + 8);
@@ -61,20 +78,15 @@ dnssoa_parse(char *zone, char *mname,
 		return;
 
 	// skip over query section
-	int dnlen;
-	int soa_offset = NS_HFIXEDSZ;
-	while (question_count) {	
-		int dnlen = dn_skipname(response + NS_HFIXEDSZ, eom);
-		hope(0 < dnlen, strerror(errno));
-		soa_offset += dnlen + 4;
-		--question_count;
-	}
-	const unsigned char *dzone = response + soa_offset;
-	dnlen = dn_expand(response, eom, dzone, zone, NS_MAXDNAME);
-	hope(0 < dnlen, strerror(errno));
+	const unsigned char *authority = response + NS_HFIXEDSZ;
+	int dnlen = dn_skipname(authority, eom);
+	authority = check_dn_soa(dnlen, authority, eom);
+	if (!authority) return;
 
-	dnlen = dn_skipname(dzone, eom);
-	const unsigned char *dmname = dzone + dnlen + 10;
+	dnlen = dn_expand(response, eom, authority, zone, NS_MAXDNAME);
+	const unsigned char *dmname = check_dn_soa(dnlen, authority, eom);
+	dmname += 6;
+
 	dnlen = dn_expand(response, eom, dmname, mname, NS_MAXDNAME);
 	hope(0 < dnlen, strerror(errno));
 }
