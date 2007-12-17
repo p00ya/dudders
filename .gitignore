@@ -1,4 +1,5 @@
 .deps
+.libs
 Makefile
 Makefile.in
 aclocal.m4
@@ -7,9 +8,12 @@ config.*
 configure
 dudders
 dudders.1
+libtool
 scripts/*
 stamp-h1
-tests/test-crypt
+tests/test-crypt-gcrypt
+tests/test-crypt-openssl
 tests/test-decode64
 tests/test-parse_pk
-tests/test-sign_query
+tests/test-sign_query-gcrypt
+tests/test-sign_query-openssl

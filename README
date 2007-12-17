@@ -41,16 +41,28 @@ A POSIX-like standard C library is expected, complete with resolver.
 The BSD, uClibc, and glibc libraries should all work.
 
 An external libarary is required by dudders for cryptography.
-The following crypto libraries are supported:
+The following packages are supported to provide crypto libraries:
  - openssl: The OpenSSL project's libcrypto
  - gcrypt: The GnuPG spinoff crypto library libgcrypt
 
-By default the `configure' shell script will try and guess which to
-use.  You can override this by calling configure with:
+At runtime dudders will try to dynamically load each of these
+libraries using dlopen(3), until one works.  The behaviour can be
+modified slightly by calling configure with:
 
-  --with-crypto=CRYPTO
+  --with-dlcrypto=LIST
 
-Where CRYPTO is "openssl" or "gcrypt".
+Where LIST is a whitespace separated list containing at least one of
+the packages above, specifying the order they should be tried at
+runtime.  All packages in this list must be available at compile-time
+and at least one at runtime.
+
+To use the system dynamic linker instead of dlopen, call configure
+with:
+
+  --with-crypto=PACKAGE
+
+Where PACKAGE is one of the packages above.  This is less flexible, but
+more portable.
 
 By default, the program is built with a considerable amount of
 debugging information.  To make it leaner, call configure with:

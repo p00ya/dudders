@@ -23,32 +23,45 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER([config.h])
 
+# Extra directory targets.
+plugindir=`(
+  test "x$prefix" = xNONE && prefix=$ac_default_prefix
+  test "x$exec_prefix" = xNONE && exec_prefix=${prefix}
+  eval echo "$libdir/dudders")`
+AC_DEFINE_UNQUOTED([PLUGIN_DIR], "$plugindir",
+  [Plugin installation directory])
+AC_SUBST([plugindir])
+
 # Checks for programs.
 AC_PROG_CC_C99
 AS_IF([test "x$ac_cv_prog_cc_stdc" = xno],
   [AC_MSG_FAILURE([get a C99 compliant compiler])])
 
-# Decide which crypto library to use.
+# Choose some crypto libraries.
 AC_ARG_WITH([crypto],
-  [AS_HELP_STRING([--with-crypto=CRYPTO],
-    [use the cryptography library CRYPTO])],
+  [AS_HELP_STRING([--with-crypto=@<:@PACKAGE@:>@],
+    [use PACKAGE for cryptography @<:@default="dl"@:>@])],[],
+  [with_crypto=dl])
+AC_ARG_WITH([dlcrypto],
+  [AS_HELP_STRING([--with-dlcrypto=@<:@LIST@:>@],
+    [use the packages in LIST for cryptography @<:@default="openssl gcrypt"@:>@])],
     [],
-    [with_crypto=guess])
+    [with_dlcrypto="openssl gcrypt"])
+
+AM_CONDITIONAL([CRYPT_DL], [test "x$with_crypto" = "xdl"])
+AM_CONDITIONAL([CRYPT_OPENSSL], [test "x$with_crypto" = "xopenssl"])
+AM_CONDITIONAL([CRYPT_GCRYPT], [test "x$with_crypto" = "xgcrypt"])
+DS_CHECK_CRYPTO([$with_crypto])
+
+DS_CHECK_DLCRYPTO([$with_dlcrypto],
+   [AC_MSG_ERROR([crypto package "$ds_crypto_package" not found])],
+   [AC_MSG_ERROR([no dynamic crypto libraries useable])])
+AM_CONDITIONAL([CRYPT_OPENSSL_OR_DL_OPENSSL],
+ [test "x$with_crypto" = "xopenssl" -o -n "$ds_crypt_dl_openssl"])
+AM_CONDITIONAL([CRYPT_GCRYPT_OR_DL_GCRYPT],
+ [test "x$with_crypto" = "xgcrypt" -o -n "$ds_crypt_dl_gcrypt"])
 
 # Checks for libraries.
-AS_IF([test "x$with_crypto" = xguess],
-  [AC_CHECK_LIB([crypto], [RSA_sign], [with_crypto=openssl],
-    [AC_CHECK_LIB([gcrypt], [gcry_check_version], [with_crypto=gcrypt],
-      [AC_MSG_FAILURE([no usable crypto library found])])])])
-
-AS_IF([test "x$with_crypto" = xopenssl],
-  [AC_CHECK_LIB([crypto], [RSA_sign])
-   CRYPTO="openssl"],
-  [test "x$with_crypto" = xgcrypt],
-  [AC_CHECK_LIB([gcrypt], [gcry_check_version])
-   CRYPTO="gcrypt"],
-  [AC_MSG_FAILURE(["$with_crypto" is not a supported crypto library])])
-
 AC_SEARCH_LIBS([gethostbyname], [nsl], [],
    [AC_MSG_FAILURE([gethostbyname(3) is required])])
 
@@ -107,7 +120,6 @@ DS_RES_NSADDR_LIST
 DS_NAMESER_DECLS
 
 # Output.
-AC_SUBST([CRYPTO])
 AC_CONFIG_FILES([dudders.1 Makefile tests/Makefile])
 AC_OUTPUT
 
