@@ -1,4 +1,4 @@
-## modernc.m4 - autoconf checks for resolver(3)             -*- Autoconf -*-
+## resolv.m4 - autoconf checks for resolver(3)                -*- Autoconf -*-
 ## Copyright 2007 Dean Scarff
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License"); you
