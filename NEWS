@@ -1,0 +1,8 @@
+Noteworthy changes in dudders-1.01
+
+ - dudders now supports multiple crypto packages at the same time,
+   using dlopen, on supported POSIX platforms.  This is enabled by
+   default.
+
+ - parsing of DNS responses is a little stricter, which prevents some
+   potential segfaults.

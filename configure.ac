@@ -16,7 +16,7 @@ dnl Process this file with autoconf to produce a configure script.
 ## limitations under the License.
 
 AC_PREREQ(2.60)
-AC_INIT([dudders], [1.00], [dudders-bugs@lists.sourceforge.net])
+AC_INIT([dudders], [1.01], [dudders-bugs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
