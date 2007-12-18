@@ -13,8 +13,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-# DS_CHECK_CRYPTO(PACKAGE)
-# ------------------------
+# DS_CHECK_CRYPTO(PACKAGE, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# ------------------------------------------------------------------
 #
 # Check that the libraries required for the crypto package PACKAGE are
 # available.
@@ -25,15 +25,15 @@ AC_DEFUN([DS_CHECK_CRYPTO],
    LIBS="$lt_cv_dlopen_libs $LIBS"dnl because we don't use libltdl
    ],
   [openssl],
-  [AC_CHECK_LIB([crypto], [RSA_sign])],
+  [AC_CHECK_LIB([crypto], [RSA_sign], [$2], [$3])],
   [gcrypt],
-  [AC_CHECK_LIB([gcrypt], [gcry_check_version])],
+  [AM_PATH_LIBGCRYPT([1.2.0], [$2], [$3])],
   [AC_MSG_ERROR([unknown crypto package "$with_crypto"])])
 ])
 
 
 # DS_CHECK_DLCRYPTO(DL-PACKAGES, [ACTION-IF-MISSING], [ACTION-IF-NONE])
-# ------------------------------------------------------------
+# ---------------------------------------------------------------------
 #
 # Check for libraries from the whitespace separated list DL-PACKAGES.
 # The symbols `CRYPT_DL_package' will be defined for each package
@@ -66,7 +66,7 @@ AS_IF([test "x$with_crypto" = "xdl"],
         ds_i=$(($ds_i+1))],
        [$2])],
       [gcrypt],
-      [AC_CHECK_LIB([gcrypt], [gcry_check_version],
+      [AM_PATH_LIBGCRYPT([1.2.0],
        [ds_crypt_dl_gcrypt=$ds_i
         AC_DEFINE_UNQUOTED([CRYPT_DL_GCRYPT], [$ds_crypt_dl_gcrypt],
          [Define to the priority of the gcrypt crypto plugin.])

@@ -50,8 +50,10 @@ TESTS += test-crypt-gcrypt test-sign_query-gcrypt
 check_PROGRAMS += test-crypt-gcrypt test-sign_query-gcrypt
 test_crypt_gcrypt_SOURCES = $(top_srcdir)/crypt_gcrypt.c
 test_crypt_gcrypt_SOURCES += test-crypt.c $(top_srcdir)/parse_pk.c $(top_srcdir)/hope.c test.c
-test_crypt_gcrypt_LDADD = -lgcrypt
+test_crypt_gcrypt_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
+test_crypt_gcrypt_LDADD = $(LIBGCRYPT_LIBS)
 
 test_sign_query_gcrypt_SOURCES = $(test_sign_query_SOURCES) $(top_srcdir)/crypt_gcrypt.c
-test_sign_query_gcrypt_LDADD = -lgcrypt
+test_sign_query_gcrypt_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
+test_sign_query_gcrypt_LDADD = $(LIBGCRYPT_LIBS)
 endif

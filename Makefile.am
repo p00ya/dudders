@@ -59,8 +59,9 @@ if CRYPT_DL_GCRYPT
     plugin_LTLIBRARIES += crypt_gcrypt.la
     dudders_LDFLAGS += -dlopen crypt_gcrypt.la
 
+    crypt_gcrypt_la_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
     crypt_gcrypt_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext .so
-    crypt_gcrypt_la_LDFLAGS += -lgcrypt
+    crypt_gcrypt_la_LDFLAGS += $(LIBGCRYPT_LIBS)
 endif
 
 else !CRYPT_DL
@@ -71,6 +72,7 @@ if CRYPT_OPENSSL
 endif
 if CRYPT_GCRYPT
     dudders_SOURCES += crypt_gcrypt.c
-    dudders_LDADD += -lgcrypt
+    dudders_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
+    dudders_LDADD += $(LIBGCRYPT_LIBS)
 endif
 endif !CRYPT_DL

@@ -51,7 +51,8 @@ AC_ARG_WITH([dlcrypto],
 AM_CONDITIONAL([CRYPT_DL], [test "x$with_crypto" = "xdl"])
 AM_CONDITIONAL([CRYPT_OPENSSL], [test "x$with_crypto" = "xopenssl"])
 AM_CONDITIONAL([CRYPT_GCRYPT], [test "x$with_crypto" = "xgcrypt"])
-DS_CHECK_CRYPTO([$with_crypto])
+DS_CHECK_CRYPTO([$with_crypto], [],
+   [AC_MSG_ERROR([crypto package "$with_crypto" unuseable])])
 
 DS_CHECK_DLCRYPTO([$with_dlcrypto],
    [AC_MSG_ERROR([crypto package "$ds_crypto_package" not found])],
