@@ -250,6 +250,8 @@ enum {
 void
 check_dnsupdate_response(const unsigned char *response, size_t length)
 {
+	hope(NS_HFIXEDSZ < length,
+	    "server returned incomplete DNS UPDATE response");
 	uint16_t flags = ns_get16(response + response_flags);
 	hope(0xa800 == (flags & 0xff00),
 	    "possible spurious DNS UPDATE response");
