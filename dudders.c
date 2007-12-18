@@ -97,7 +97,7 @@ static
 void
 infer_keyname(const char *filename)
 {
-	const char *base = basename(filename);
+	const char *base = basename((char *)filename);
 	hope2(base, filename, strerror(errno));
 	hope2('K' == *base, filename,
 	    "not a dnssec-keygen(8) filename");
