@@ -20,6 +20,7 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -148,9 +149,12 @@ parse_pk_file(FILE *fp, void (*cb)(unsigned, const char *))
 
 	while (!feof(fp)) {
 		fgets(buf, DNSSEC_PRIVATE_MAX_LINE, fp);
+		hope2(!ferror(fp), "reading private key", strerror(errno));
 		char *colon = strchr(buf, ':');
 		char *nl = strchr(buf, '\n');
 		if (!colon || ' ' != colon[1])
+			break;
+		if (DNSSEC_PRIVATE_MAX_LINE - 2 <= colon - buf)
 			break;
 		*colon = 0;
 		if (nl)

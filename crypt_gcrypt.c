@@ -97,11 +97,24 @@ load_line(enum pk_field_key field, const char *data)
 	kparts[field] = buf;
 }
 
+/* Return the 1-based index of the first missing key-part, or 0 if all
+ * required key parts were present. */
+static
+int
+check_kparts()
+{
+	for (int i = 0; i < PKFK_SIZE; ++i)
+		if (!kparts[i])
+			return i + 1;
+	return 0;
+}
+
 // See crypt.h
 void
 crypt_load_key(FILE *privkey)
 {
 	parse_pk_file(privkey, &load_line);
+	hope(!check_kparts(), "private key missing parts");
 	// the primes are swapped and thus the CRT coefficient is invalid
 	gcry_mpi_t u, p, q;
 	gcry_mpi_scan(&q, GCRYMPI_FMT_USG,
