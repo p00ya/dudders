@@ -24,8 +24,8 @@ ACLOCAL_AMFLAGS = -I m4
 # targets.
 SUBDIRS = tests
 bin_PROGRAMS = dudders
-man1_MANS = dudders.1
-EXTRA_DIST = configure.ac dudders.1.in NOTES
+man8_MANS = dudders.8
+EXTRA_DIST = configure.ac dudders.8.in NOTES
 MAINTAINERCLEANFILES = $(RM) configure Makefile.in tests/Makefile.in aclocal.m4 config.h.in scripts/depcomp scripts/install-sh scripts/missing
 
 # dudders binary.

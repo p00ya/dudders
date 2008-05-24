@@ -25,7 +25,7 @@ The ISC BIND 9 Administrator Reference Manual contains instructions
 for configuring your zone's DNS server to support a SIG(0) update,
 under the DNSSEC section.
 
-For instructions on how to invoke the program, consult the dudders(1)
+For instructions on how to invoke the program, consult the dudders(8)
 manual page which is built by configure.
 
 License

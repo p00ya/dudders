@@ -7,7 +7,7 @@ autom4te.cache
 config.*
 configure
 dudders
-dudders.1
+dudders.8
 libtool
 scripts/*
 stamp-h1

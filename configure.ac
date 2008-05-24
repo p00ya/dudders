@@ -121,7 +121,7 @@ DS_RES_NSADDR_LIST
 DS_NAMESER_DECLS
 
 # Output.
-AC_CONFIG_FILES([dudders.1 Makefile tests/Makefile])
+AC_CONFIG_FILES([dudders.8 Makefile tests/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([configuration complete.])
