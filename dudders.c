@@ -108,8 +108,6 @@ infer_keyname(const char *filename)
 	keyname = xmalloc(namelen + 1);
 	strncpy(keyname, base, namelen);
 	keyname[namelen] = 0;
-	hope2(NS_MAXDNAME >= namelen, keyname,
-	    "key name too long");
 }
 
 /* Parse options from the command line. */
@@ -117,7 +115,7 @@ void
 parse_options(int argc, char **argv)
 {
 	int c;
-	while (-1 != (c = getopt(argc, argv, "k:n:"))) {
+	while (-1 != (c = getopt(argc, argv, "k:n:m:z:"))) {
 		switch (c) {
 		case 'k':
 			key_filename = optarg;
@@ -126,6 +124,12 @@ parse_options(int argc, char **argv)
 			break;
 		case 'n':
 			keyname = optarg;
+			break;
+		case 'm':
+			mname = optarg;
+			break;
+		case 'z':
+			zone = optarg;
 			break;
 		case '?':
 		default:
@@ -147,8 +151,8 @@ get_zone()
 	// get zone and primary name server.  We search up the domain
 	// tree until a SOA is found.  This is the zone (see RFC1034
 	// 4.2p4).
-	zone = xmalloc(NS_MAXDNAME);
-	mname = xmalloc(NS_MAXDNAME);
+	char *zonebuf = xmalloc(NS_MAXDNAME);
+	char *mnamebuf = xmalloc(NS_MAXDNAME);
 	for (const char *xzone = domain; ; ++xzone) {
 		memset(ansbuf, 0, NS_HFIXEDSZ); // helps dnssoa_parse
 		err = res_query(xzone, ns_c_in, ns_t_soa,
@@ -156,13 +160,13 @@ get_zone()
 		hope(-1 != err || NO_RECOVERY != h_errno,
 		    hstrerror(h_errno));
 		if (0 < err) {
-			dnssoa_parse(zone, mname, ansbuf, err);
+			dnssoa_parse(zonebuf, mnamebuf, ansbuf, err);
 			break;
 		} else if (TRY_AGAIN == h_errno || NO_DATA == h_errno) {
 			// an authority may still be present despite
 			// these errors
-			dnssoa_parse(zone, mname, ansbuf, NS_PACKETSZ);
-			if (*zone)
+			dnssoa_parse(zonebuf, mnamebuf, ansbuf, NS_PACKETSZ);
+			if (*zonebuf && *mnamebuf)
 				break;
 		}
 		xzone = strchr(xzone, '.');
@@ -171,6 +175,14 @@ get_zone()
 	}
 	free(qbuf);
 	free(ansbuf);
+	if (zone)
+		free(zonebuf);
+	else
+		zone = zonebuf;
+	if (mname)
+		free(mnamebuf);
+	else
+		mname = mnamebuf;
 }
 
 /* Set `ns_addr' to the IP address of `mname'. */
@@ -208,6 +220,8 @@ main(int argc, char *argv[])
 		keyfile = stdin;
 	if (!keyname && key_filename)
 		infer_keyname(key_filename);
+	hope2(NS_MAXDNAME >= strlen(keyname), keyname,
+	    "key name too long");
 
 	argc -= optind;
 	argv += optind;
@@ -223,7 +237,15 @@ main(int argc, char *argv[])
 	err = inet_aton(argv[ARGV_ADDRESS], &addr);
 	hope2(1 == err, argv[ARGV_ADDRESS], strerror(errno));
 
-	get_zone();
+	// get master server
+	if (!mname || !zone)
+		get_zone();
+	else {
+		hope2(NS_MAXDNAME >= strlen(mname), mname,
+		    "master domain too long");
+		hope2(NS_MAXDNAME >= strlen(zone), zone,
+		    "zone domain too long");
+	}
 	get_ns_addr();
 
 	// initialise key
