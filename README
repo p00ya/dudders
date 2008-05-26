@@ -4,13 +4,11 @@ dudders README
 Users
 -----
 
-Dudders is a utility for updating DNS records.
+Dudders is a utility for updating DNS records.  It points a domain
+name to a given IP address, using the RFC2136 DNS UPDATE protocol and
+a SIG(0) signature.  It is designed with embedded systems in mind.
 
-Dudders spells "DHCP Updating DNS Duly Embracing RSA SIG(0)" (with
-some poetic license).  It points a domain name to a given IP address,
-using the RFC2136 DNS UPDATE protocol and a SIG(0) signature.  It is
-designed with embedded systems in mind.  This has several implications
-for users:
+This has several implications for users:
 
  - you can't use it to do all the things DNS UPDATE can do,
  - it will error and exit rather than dealing with problems;
@@ -26,7 +24,10 @@ for configuring your zone's DNS server to support a SIG(0) update,
 under the DNSSEC section.
 
 For instructions on how to invoke the program, consult the dudders(8)
-manual page which is built by configure.
+manual page, which is built by configure.
+
+With some poetic license, dudders spells "Dynamically Updating DNS
+Duly Embracing RSA SIG(0)".
 
 License
 -------
@@ -64,8 +65,8 @@ with:
 Where PACKAGE is one of the packages above.  This is less flexible, but
 more portable.
 
-By default, the program is built with a considerable amount of
-debugging information.  To make it leaner, call configure with:
+By default, the program is built with a meagre amount of debugging
+information.  To make it leaner, call configure with:
 
   CFLAGS="-DNDEBUG -O2"
 
