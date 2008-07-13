@@ -45,8 +45,8 @@ noinst_LTLIBRARIES =
 if CRYPT_DL
   dudders_SOURCES += crypt_dl.c
 
-  crypt_openssl_la_SOURCES = crypt_openssl.c parse_pk.c
-  crypt_gcrypt_la_SOURCES = crypt_gcrypt.c parse_pk.c
+  crypt_openssl_la_SOURCES = crypt_openssl.c parse_pk.c hope.c
+  crypt_gcrypt_la_SOURCES = crypt_gcrypt.c parse_pk.c hope.c
 
 if CRYPT_DL_OPENSSL
     plugin_LTLIBRARIES += crypt_openssl.la

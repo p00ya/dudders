@@ -36,6 +36,7 @@ const char *program_invocation = "";
 #  define PFL()
 # endif
 
+#pragma GCC visibility push(hidden)
 void
 hope_(const char *e FL)
 {
@@ -64,3 +65,4 @@ xmalloc_(size_t size FL)
 	}
 	return p;
 }
+#pragma GCC visibility pop
