@@ -1,3 +1,18 @@
+Noteworthy changes in dudders-1.02
+
+ - The crypto plugins should no longer export unresolved symbols.
+
+ - The authority can now be overidden with the -m and -z options.
+   This circumvents the search for the master and zone using the local
+   resolver.
+
+ - The manual page is now in section 8, and has been renamed
+   accordingly.
+
+ - Private key parsing is stricter, which prevents some potential
+   segfaults (for example when trying to use a dnssec-keygen .key file
+   instead of the .private file).
+
 Noteworthy changes in dudders-1.01
 
  - dudders now supports multiple crypto packages at the same time,
