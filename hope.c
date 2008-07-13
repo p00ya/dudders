@@ -27,14 +27,14 @@
 
 const char *program_invocation = "";
 
-# ifndef NDEBUG
-#  define FL , const char* file, unsigned line
-#  define PFL()						\
+#ifndef NDEBUG
+# define FL , const char* file, unsigned line
+# define PFL()						\
 	fprintf(stderr, "(From %s:%u)\n", file, line)
-# else
-#  define FL
-#  define PFL()
-# endif
+#else
+# define FL
+# define PFL()
+#endif
 
 #pragma GCC visibility push(hidden)
 void
