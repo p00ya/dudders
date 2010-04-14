@@ -18,7 +18,7 @@
 .Nm dudders
 .Nd update DNS record
 .Sh SYNOPSIS
-.B dudders
+.Nm dudders
 .Op Fl k Ar PRIVKEY
 .Op Fl n Ar KEYNAME
 .Op Fl m Ar MNAME
