@@ -260,7 +260,7 @@ main(int argc, char *argv[])
 	unsigned char *ansbuf = xmalloc(NS_PACKETSZ); // answer
 
 	dst = wire_dnsupdate_message(qbuf,
-	    zone, argv[ARGV_DOMAIN], addr);
+	    zone, argv[ARGV_DOMAIN], addr, ttl);
 	dst = sign_dnsupdate_message(dst, qbuf, keyname);
 
 	// send update request

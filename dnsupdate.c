@@ -125,6 +125,7 @@ static const char update_2[] =
 
 enum {
 	update_3_domain = 10,
+	update_3_ttl = 16,
 	update_3_addr = 22,
 };
 
@@ -140,7 +141,7 @@ static const char update_3[] =
 	NS_CMPRSFLGS, 0, // compressed name, to be overwritten
 	0, ns_t_a, // type
 	0, ns_c_in, // class
-	0, 1, 0x51, 0x80, // ttl = 86400 (1D)
+	0, 0, 0, 0, // ttl, to be overwritten
 	0, 4, // rdlength
 	0, 0, 0, 0, // ip address, to be ovewritten
 };
@@ -178,7 +179,7 @@ static const char update_4[] = {
 // See dnsupdate.h
 char *
 wire_dnsupdate_message(char *dst, const char *zone, const char *domain,
-    struct in_addr addr)
+    struct in_addr addr, uint32_t ttl)
 {
 	char *base = dst, *dom, *base3;
 	names[0] = (unsigned char *)base;
@@ -194,6 +195,7 @@ wire_dnsupdate_message(char *dst, const char *zone, const char *domain,
 	// because we only allocated two octets for it.
 	uint16_t compressed_domain = (dom - base) | (NS_CMPRSFLGS << 8);
 	wire_short(base3 + update_3_domain, compressed_domain);
+	wire_long(base3 + update_3_ttl, ttl);
 	memcpy(base3 + update_3_addr, (char *)&addr, 4);
 	return dst;
 }

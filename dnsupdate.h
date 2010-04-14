@@ -26,9 +26,10 @@
 
 /* Write a DNS UPDATE request to `dst'.  The request will be to delete
  * an A record for `domain' in `zone', then add it again with the
- * address `addr'.  Returns the first octet after the message. */
+ * address `addr' and time to live of `ttl' seconds.  Returns the
+ * first octet after the message. */
 unsigned char *wire_dnsupdate_message(unsigned char *dst,
-    const char *zone, const char *domain, struct in_addr addr);
+    const char *zone, const char *domain, struct in_addr addr, uint32_t ttl);
 
 /* Sign `query' by writing the cryptographic signature to `dst'.
  * `query' is the full query except for the signature field of the
