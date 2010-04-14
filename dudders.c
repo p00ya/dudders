@@ -65,7 +65,7 @@ void
 usage()
 {
 	printf("%s\n\nReport bugs to <%s>.\n",
-	    "Usage:\n  dudders [-k KEYFILE] [-n KEYNAME] DOMAIN TTL ADDRESS\n\n"
+	    "Usage:\n  dudders [-k KEYFILE] [-n KEYNAME] [-m MNAME] [-z ZONE] DOMAIN TTL ADDRESS\n\n"
 	    "Sign a DNS UPDATE of DOMAIN to ADDRESS with KEYFILE.",
 	    PACKAGE_BUGREPORT);
 }
