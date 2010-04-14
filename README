@@ -14,10 +14,10 @@ This has several implications for users:
  - it will error and exit rather than dealing with problems;
  - it will fit and work on your embedded device!
 
-For a general purpose DNS UPDATE utility, use ISC's nsupdate, which is
-distributed with BIND.  Other free clients with similar functionality
-include ddclient, ez-ipupdate, updatedd, ipupdate, and dnssec-tools's
-ifup-dyndns.
+For a general purpose DNS UPDATE utility where space is not a concern,
+use ISC's nsupdate, which is distributed with BIND.  Other free clients
+with similar functionality include ddclient, ez-ipupdate, updatedd,
+ipupdate, and dnssec-tools's ifup-dyndns.
 
 The ISC BIND 9 Administrator Reference Manual contains instructions
 for configuring your zone's DNS server to support a SIG(0) update,
