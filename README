@@ -41,7 +41,7 @@ Installation
 A POSIX-like standard C library is expected, complete with resolver.
 The BSD, uClibc, and glibc libraries should all work.
 
-An external libarary is required by dudders for cryptography.
+An external library is required by dudders for cryptography.
 The following packages are supported to provide crypto libraries:
  - openssl: The OpenSSL project's libcrypto
  - gcrypt: The GnuPG spinoff crypto library libgcrypt
