@@ -1,7 +1,7 @@
 dnl configure.ac -- configure template                  -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
-## Copyright 2007 Dean Scarff
+## Copyright 2007--2010 Dean Scarff
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License"); you
 ## may not use this file except in compliance with the License.  You
@@ -16,7 +16,7 @@ dnl Process this file with autoconf to produce a configure script.
 ## limitations under the License.
 
 AC_PREREQ(2.65)
-AC_INIT([dudders], [1.02], [dudders-bugs@lists.sourceforge.net])
+AC_INIT([dudders], [1.03], [dudders-bugs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

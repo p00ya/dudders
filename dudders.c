@@ -1,6 +1,6 @@
 /* dudders.c -- Use SIG(0) key to renew a dynamic DNS domain
  *
- * Copyright 2007 Dean Scarff
+ * Copyright 2007--2010 Dean Scarff
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You
