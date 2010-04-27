@@ -220,8 +220,14 @@ main(int argc, char *argv[])
 		keyfile = stdin;
 	if (!keyname && key_filename)
 		infer_keyname(key_filename);
+	if (!keyname) {
+		fprintf(stderr, "%s: %s\n",
+		    program_invocation,
+		    "keyname neither explicitly provided nor inferable");
+		return usage(), EXIT_FAILURE;
+	}
 	hope2(NS_MAXDNAME >= strlen(keyname), keyname,
-	    "key name too long");
+	    "keyname too long");
 
 	argc -= optind;
 	argv += optind;
