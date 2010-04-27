@@ -50,14 +50,12 @@ if CRYPT_DL
 
 if CRYPT_DL_OPENSSL
     plugin_LTLIBRARIES += crypt_openssl.la
-    dudders_LDFLAGS += -dlopen crypt_openssl.la
 
     crypt_openssl_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext .so
     crypt_openssl_la_LDFLAGS += -lcrypto
 endif
 if CRYPT_DL_GCRYPT
     plugin_LTLIBRARIES += crypt_gcrypt.la
-    dudders_LDFLAGS += -dlopen crypt_gcrypt.la
 
     crypt_gcrypt_la_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
     crypt_gcrypt_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext .so

@@ -15,7 +15,7 @@ dnl Process this file with autoconf to produce a configure script.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-AC_PREREQ(2.60)
+AC_PREREQ(2.65)
 AC_INIT([dudders], [1.02], [dudders-bugs@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
@@ -35,7 +35,7 @@ AC_SUBST([plugindir])
 # Checks for programs.
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
-AC_PROG_LIBTOOL
+LT_INIT([dlopen])
 AS_IF([test "x$ac_cv_prog_cc_stdc" = xno],
   [AC_MSG_FAILURE([get a C99 compliant compiler])])
 
