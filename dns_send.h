@@ -22,14 +22,10 @@
 #  include "config.h"
 # endif
 
-/* Send the `length' octets of the DNS message `msg' to the default
- * nameserver.  The response, if any, is written to `dst', and the
+/* Send the `length' octets of the DNS message `msg' to the nameserver
+ * at `addr'.  The response, if any, is written to `dst', and the
  * minimum address after the response is returned.  The buffer `dst'
  * must be sufficiently long to receive a DNS message. */
-unsigned char *dns_send(unsigned char *dst,
-    const unsigned char *msg, size_t length);
-
-/* Like `dns_send', but send the query to the server `addr'. */
 unsigned char *dns_send_addr(unsigned char *dst,
     const unsigned char *msg, size_t length,
     struct sockaddr_in *addr);

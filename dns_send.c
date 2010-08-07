@@ -81,17 +81,3 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	return NULL;
 #endif
 }
-
-unsigned char *
-dns_send(unsigned char *dst, const unsigned char *msg, size_t msglen)
-{
-#ifdef HAVE_RES_SEND
-	int i = res_send(msg, msglen, dst, NS_PACKETSZ);
-	hope(-1 != i, strerror(errno));
-	return dst + i;
-#elif HAVE_DECL__RES_NSADDR_LIST
-	res_init();
-	struct sockaddr_in *addr = _res.nsaddr_list;
-	return dns_send_addr(dst, msg, msglen, addr);
-#endif
-}
