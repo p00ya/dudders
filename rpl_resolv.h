@@ -46,4 +46,12 @@ p_rcode(unsigned char rcode)
 }
 #endif
 
+#if !HAVE_DECL_RES_TIMEOUT
+# define RES_TIMEOUT 5
+#endif
+
+#if !HAVE_DECL_RES_DFLRETRY
+# define RES_DFLRETRY 2
+#endif
+
 #endif /* !defined(RPL_RESOLV_H) */

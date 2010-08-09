@@ -122,6 +122,11 @@ DS_RESOLV_LINK([p_rcode], [p_rcode(0)])
 # Checks for declarations.
 DS_RES_NSADDR_LIST
 DS_NAMESER_DECLS
+AC_CHECK_DECLS([RES_TIMEOUT,RES_DFLRETRY],[],[],dnl
+[[@%:@ifdef HAVE_RESOLV_H
+@%:@include <resolv.h>
+@%:@endif
+]])
 
 # Output.
 AC_CONFIG_FILES([dudders.8 Makefile tests/Makefile])
