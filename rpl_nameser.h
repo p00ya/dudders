@@ -86,4 +86,48 @@
 # define ns_t_sig 24 /* RFC2535 4 */
 #endif
 
+
+# ifndef HAVE_NS_GET16
+#  undef ns_get16
+static inline
+uint16_t
+ns_get16(const unsigned char *src)
+{
+#  ifdef WORDS_BIGENDIAN
+	return *((uint16_t *) src);
+#  else
+	uint16_t x = (uint16_t)(*src) << 8;
+	x |= (uint16_t)(src[1]);
+	return x;
+#  endif /* !defined(WORDS_BIGENDIAN) */
+}
+# endif
+
+# ifndef HAVE_NS_PUT16
+#  undef ns_put16
+static inline
+void
+ns_put16(uint16_t src, unsigned char *dst)
+{
+	dst[1] = (unsigned char)src;
+	dst[0] = (unsigned char)(src >> 8);
+}
+# endif  /* !defined(HAVE_NS_PUT16) */
+
+# ifndef HAVE_NS_PUT32
+#  undef ns_put32
+static inline
+void
+ns_put32(uint32_t src, unsigned char *dst)
+{
+	dst[3] = (unsigned char)src;
+	src >>= 8;
+	dst[2] = (unsigned char)src;
+	src >>= 8;
+	dst[1] = (unsigned char)src;
+	src >>= 8;
+	dst[0] = (unsigned char)src;
+}
+# endif /* !defined(HAVE_NS_PUT32) */
+
 #endif /* !defined(RPL_NAMESER_H) */
