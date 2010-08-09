@@ -116,6 +116,7 @@ DS_RESOLV_LINK([dn_comp],
 DS_RESOLV_LINK([ns_put16], [ns_put16(0, NULL)])
 DS_RESOLV_LINK([ns_put32], [ns_put32(0, NULL)])
 DS_RESOLV_LINK([ns_get16], [ns_get16(NULL)])
+DS_RESOLV_LINK([ns_get32], [ns_get32(NULL)])
 DS_RESOLV_LINK([p_rcode], [p_rcode(0)])
 
 # Checks for declarations.

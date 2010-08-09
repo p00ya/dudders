@@ -93,15 +93,26 @@ static inline
 uint16_t
 ns_get16(const unsigned char *src)
 {
-#  ifdef WORDS_BIGENDIAN
-	return *((uint16_t *) src);
-#  else
 	uint16_t x = (uint16_t)(*src) << 8;
 	x |= (uint16_t)(src[1]);
 	return x;
-#  endif /* !defined(WORDS_BIGENDIAN) */
 }
-# endif
+# endif /* !defined(HAVE_NS_GET16) */
+
+# ifndef HAVE_NS_GET32
+#  undef ns_get32
+static inline
+uint32_t
+ns_get32(const unsigned char *src)
+{
+	uint32_t x;
+	x  = (uint32_t)src[0] << 24;
+	x |= (uint32_t)src[1] << 16;
+	x |= (uint32_t)src[2] << 8;
+	x |= (uint32_t)src[3];
+	return x;
+}
+# endif /* !defined(HAVE_NS_GET32) */
 
 # ifndef HAVE_NS_PUT16
 #  undef ns_put16
