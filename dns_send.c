@@ -37,16 +37,48 @@
 
 #include "hope.h"
 
+/* Check that `dst' looks like a response to `msg'. */
+static int
+check_response(const unsigned char *dst, const unsigned char *msg)
+{
+	uint32_t qhead = ns_get32(msg);
+	uint32_t anshead = ns_get32(dst);
+
+	// mask out RCODE and Z (including RA bit)
+	qhead &= 0xffffff00;
+	anshead &= 0xffffff00; // sometimes RA gets set spuriously
+
+	anshead ^= 0x00008000; // flip QR bit
+
+	return qhead == anshead;
+}
+
 unsigned char *
 dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
     struct sockaddr_in *addr)
 {
 #if defined(HAVE_RES_SEND) && HAVE_DECL__RES_NSADDR_LIST
+	// fill dst so we can detect if it has been written to
+	dst[0] = ~msg[0];
+	dst[1] = ~msg[1];
+	memset(dst + 2, 0xff, NS_HFIXEDSZ - 2);
 	res_init();
 	struct sockaddr_in save = _res.nsaddr_list[0];
+	int save_count = _res.nscount;
 	_res.nsaddr_list[0] = *addr;
+	_res.nscount = 1;
 	int i = res_send(msg, msglen, dst, NS_PACKETSZ);
+
+	// Some resolvers are erroneously reporting ETIMEDOUT even
+	// with a valid response.  We'll accept a packet providing it
+	// looks like a response has been written to the dst buffer.
+	if (-1 == i && ETIMEDOUT == errno &&
+	    check_response(dst, msg) &&
+	    0xff != dst[NS_HFIXEDSZ - 1])
+		return dst + NS_HFIXEDSZ;
+
 	_res.nsaddr_list[0] = save;
+	_res.nscount = save_count;
 	hope(i != -1, strerror(errno));
 	return dst + i;
 #else
@@ -55,7 +87,6 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	ssize_t send = sendto(sd, msg, msglen, 0,
 	    (struct sockaddr *) addr, sizeof(*addr));
 	hope(-1 != send, strerror(errno));
-	uint16_t transaction_id = *((uint16_t *)msg);
 
 	enum {
 		RES_RETRY = 4, // times to retry sending
@@ -71,8 +102,8 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 		if (-1 == recv_length && EAGAIN == errno)
 			continue;
 		hope(-1 != recv_length, strerror(errno));
-		hope(transaction_id == *((uint16_t *)dst),
-		    "erroneous transaction id");
+		hope(check_response(dst, msg),
+		    "response did not match query");
 
 		close(sd);
 		return dst + recv_length;
