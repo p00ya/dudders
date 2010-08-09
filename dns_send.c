@@ -35,6 +35,9 @@
 #include "rpl_nameser.h"
 #include <resolv.h>
 
+#include <sys/select.h>
+#include <fcntl.h>
+
 #include "hope.h"
 
 /* Check that `dst' looks like a response to `msg'. */
@@ -81,26 +84,37 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	_res.nscount = save_count;
 	hope(i != -1, strerror(errno));
 	return dst + i;
-#else
+#else /* !defined(HAVE_RES_SEND) || !HAVE_DECL__RES_NSADDR_LIST */
 	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	hope(-1 != sd, strerror(errno));
-	ssize_t send = sendto(sd, msg, msglen, 0,
-	    (struct sockaddr *) addr, sizeof(*addr));
-	hope(-1 != send, strerror(errno));
 
-	enum {
-		RES_RETRY = 4, // times to retry sending
-		RES_RETRANS = 4, // seconds to sleep between retries
-	};
-	for (int i = 0; i < RES_RETRY; sleep(RES_RETRANS), ++i) {
+	int err = fcntl(sd, F_SETFL, fcntl(sd, F_GETFL) | O_NONBLOCK);
+	hope(-1 != err, strerror(errno));
+
+	struct timeval timeout;
+	fd_set fds;
+	FD_ZERO(&fds);
+	for (int i = 0; i < RES_DFLRETRY; ++i) {
+		ssize_t send = sendto(sd, msg, msglen, 0,
+		    (struct sockaddr *) addr, sizeof(*addr));
+		hope(-1 != send, strerror(errno));
+
+		FD_SET(sd, &fds);
+		timeout.tv_sec = RES_TIMEOUT;
+		timeout.tv_usec = 0;
+		do
+			err = select(sd + 1, &fds, NULL, NULL, &timeout);
+		while (0 > err && EAGAIN == errno);
+		hope(0 <= err, strerror(errno));
+		if (0 == err)
+			continue;
+
 		struct sockaddr_in from_addr;
 		socklen_t addr_length = sizeof(from_addr);
 		ssize_t recv_length;
 		recv_length = recvfrom(sd, dst, NS_PACKETSZ, 0,
 		    (struct sockaddr *) &from_addr, &addr_length);
 
-		if (-1 == recv_length && EAGAIN == errno)
-			continue;
 		hope(-1 != recv_length, strerror(errno));
 		hope(check_response(dst, msg),
 		    "response did not match query");
@@ -109,6 +123,8 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 		return dst + recv_length;
 	}
 	close(sd);
+	nohope("request timed out");
+
 	return NULL;
-#endif
+#endif /* !defined(HAVE_RES_SEND) || !HAVE_DECL__RES_NSADDR_LIST */
 }
