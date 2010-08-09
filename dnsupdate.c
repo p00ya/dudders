@@ -257,6 +257,12 @@ check_dnsupdate_response(const unsigned char *response, size_t length)
 	uint16_t flags = ns_get16(response + response_flags);
 	hope(0xa800 == (flags & 0xff00),
 	    "possible spurious DNS UPDATE response");
+	const unsigned char *r = response + 4;
+	unsigned char anyset = 0;
+	while (r < response + 12)
+		anyset |= *r++;
+	hope(!anyset || !memcmp(update_1 + 4, response + 4, 8),
+	    "DNS UPDATE counts do not match query");
 	hope2(0 == (flags & 0x000f),
 	    "DNS UPDATE error", p_rcode(flags & 0x000f));
 }
