@@ -75,7 +75,8 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	// Some resolvers are erroneously reporting ETIMEDOUT even
 	// with a valid response.  We'll accept a packet providing it
 	// looks like a response has been written to the dst buffer.
-	if (-1 == i && ETIMEDOUT == errno &&
+	if (-1 == i &&
+	    (ETIMEDOUT == errno || ECONNREFUSED == errno) &&
 	    check_response(dst, msg) &&
 	    0xff != dst[NS_HFIXEDSZ - 1])
 		return dst + NS_HFIXEDSZ;
