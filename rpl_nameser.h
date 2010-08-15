@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+# include <stdint.h>
+
 #if !HAVE_DECL_NS_MAXDNAME
 # define NS_MAXDNAME 255 /* RFC3696 p. 4 */
 #endif

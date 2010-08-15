@@ -22,8 +22,6 @@
 #  include "config.h"
 # endif
 
-# include <stdint.h>
-
 # ifndef HAVE_DN_SKIPNAME
 #  undef dn_skipname
 int dn_skipname(const unsigned char *comp_dn, const unsigned char *eom);
