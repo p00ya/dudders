@@ -26,7 +26,10 @@
  * at `addr'.  The response, if any, is written to `dst', and the
  * minimum address after the response is returned.  The buffer `dst'
  * must be sufficiently long to receive a DNS message.  If `use_tcp'
- * is non-zero, use TCP/IP to send the message, otherwise use UDP. */
+ * is non-zero, use TCP/IP to send the message, otherwise use UDP.
+ *
+ * The `dst' buffer should have a capacity of at least NS_PACKETSZ
+ * octets. */
 unsigned char *dns_send_addr(unsigned char *dst,
     const unsigned char *msg, size_t length,
     struct sockaddr_in *addr, int use_tcp);

@@ -148,11 +148,11 @@ unsigned char *
 dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
     struct sockaddr_in *addr, int use_tcp)
 {
-#if USE_RES_SEND
-	// fill dst so we can detect if it has been written to
 	dst[0] = ~msg[0];
 	dst[1] = ~msg[1];
 	memset(dst + 2, 0xff, NS_HFIXEDSZ - 2);
+#if USE_RES_SEND
+	// fill dst so we can detect if it has been written to
 	res_init();
 	struct sockaddr_in save = _res.nsaddr_list[0];
 	int save_count = _res.nscount;
