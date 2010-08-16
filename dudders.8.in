@@ -19,6 +19,7 @@
 .Nd update DNS record
 .Sh SYNOPSIS
 .Nm dudders
+.Op Fl T
 .Op Fl k Ar PRIVKEY
 .Op Fl n Ar KEYNAME
 .Op Fl m Ar MNAME
@@ -81,6 +82,8 @@ is not authorised for signing transactions for
 or that the master server does not support the update protocol.
 .Sh OPTIONS
 .Bl -tag -width 8n
+.It Fl T
+Send update message over TCP (default is UDP).
 .It Fl k Ar PRIVKEY
 Look in the file
 .Ar PRIVKEY

@@ -35,6 +35,12 @@
 #include "rpl_nameser.h"
 #include <resolv.h>
 
+#if defined(HAVE_RES_SEND) && HAVE_DECL__RES_NSADDR_LIST
+# define USE_RES_SEND 1
+#else
+# define USE_RES_SEND 0
+#endif
+
 #include <sys/select.h>
 #include <fcntl.h>
 
@@ -56,11 +62,93 @@ check_response(const unsigned char *dst, const unsigned char *msg)
 	return qhead == anshead;
 }
 
+#if !USE_RES_SEND
+/* Like `dns_send_addr', but always use UDP. */
+static unsigned char *
+dns_send_addr_udp(unsigned char *dst, const unsigned char *msg,
+    size_t msglen, struct sockaddr_in *addr)
+{
+	int sd;
+	sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	hope(-1 != sd, strerror(errno));
+
+	int err = fcntl(sd, F_SETFL, fcntl(sd, F_GETFL) | O_NONBLOCK);
+	err = connect(sd, (struct sockaddr *) addr, sizeof(*addr));
+	hope(-1 != err, strerror(errno));
+
+	struct timeval timeout;
+	fd_set fds;
+	FD_ZERO(&fds);
+	for (int i = 0; i < RES_DFLRETRY; ++i) {
+		ssize_t length;
+		length = send(sd, msg, msglen, 0);
+		hope(-1 != length, strerror(errno));
+
+		FD_SET(sd, &fds);
+		timeout.tv_sec = RES_TIMEOUT;
+		timeout.tv_usec = 0;
+		do
+			err = select(sd + 1, &fds, NULL, NULL, &timeout);
+		while (0 > err && EAGAIN == errno);
+		hope(0 <= err, strerror(errno));
+		if (0 == err)
+			continue;
+
+		length = recv(sd, dst, NS_PACKETSZ, 0);
+		hope(-1 != length, strerror(errno));
+		hope(check_response(dst, msg),
+		    "response did not match query");
+
+		close(sd);
+		return dst + length;
+	}
+	close(sd);
+	nohope("request timed out");
+
+	return NULL;
+}
+
+/* Like `dns_send_addr', but always use TCP. */
+static unsigned char *
+dns_send_addr_tcp(unsigned char *dst, const unsigned char *msg,
+    size_t msglen, struct sockaddr_in *addr)
+{
+	int sd;
+	sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	hope(-1 != sd, strerror(errno));
+
+	int err;
+	err = connect(sd, (struct sockaddr *) addr, sizeof(*addr));
+	hope(-1 != err, strerror(errno));
+
+	ssize_t length;
+	uint16_t length_header = htons(msglen);
+	length = write(sd, &length_header, 2);
+	hope(-1 != length, strerror(errno));
+	length = write(sd, msg, msglen);
+	hope(-1 != length, strerror(errno));
+
+	length = read(sd, &length_header, 2);
+	hope(2 == length, "couldn't read length field");
+	length_header = ntohs(length_header);
+	if (length_header > NS_PACKETSZ)
+		length_header = NS_PACKETSZ;
+	length = read(sd, dst, length_header);
+	hope(-1 != length, strerror(errno));
+	hope(length_header == length, "truncated response");
+	hope(check_response(dst, msg), "response did not match query");
+
+	close(sd);
+	return dst + length;
+}
+#endif /* USE_RES_SEND */
+
+// See dns_send.h
 unsigned char *
 dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
-    struct sockaddr_in *addr)
+    struct sockaddr_in *addr, int use_tcp)
 {
-#if defined(HAVE_RES_SEND) && HAVE_DECL__RES_NSADDR_LIST
+#if USE_RES_SEND
 	// fill dst so we can detect if it has been written to
 	dst[0] = ~msg[0];
 	dst[1] = ~msg[1];
@@ -70,6 +158,8 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	int save_count = _res.nscount;
 	_res.nsaddr_list[0] = *addr;
 	_res.nscount = 1;
+	if (use_tcp)
+		_res.options |= RES_USEVC;
 	int i = res_send(msg, msglen, dst, NS_PACKETSZ);
 
 	// Some resolvers are erroneously reporting ETIMEDOUT even
@@ -85,47 +175,10 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	_res.nscount = save_count;
 	hope(i != -1, strerror(errno));
 	return dst + i;
-#else /* !defined(HAVE_RES_SEND) || !HAVE_DECL__RES_NSADDR_LIST */
-	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	hope(-1 != sd, strerror(errno));
-
-	int err = fcntl(sd, F_SETFL, fcntl(sd, F_GETFL) | O_NONBLOCK);
-	hope(-1 != err, strerror(errno));
-
-	struct timeval timeout;
-	fd_set fds;
-	FD_ZERO(&fds);
-	for (int i = 0; i < RES_DFLRETRY; ++i) {
-		ssize_t send = sendto(sd, msg, msglen, 0,
-		    (struct sockaddr *) addr, sizeof(*addr));
-		hope(-1 != send, strerror(errno));
-
-		FD_SET(sd, &fds);
-		timeout.tv_sec = RES_TIMEOUT;
-		timeout.tv_usec = 0;
-		do
-			err = select(sd + 1, &fds, NULL, NULL, &timeout);
-		while (0 > err && EAGAIN == errno);
-		hope(0 <= err, strerror(errno));
-		if (0 == err)
-			continue;
-
-		struct sockaddr_in from_addr;
-		socklen_t addr_length = sizeof(from_addr);
-		ssize_t recv_length;
-		recv_length = recvfrom(sd, dst, NS_PACKETSZ, 0,
-		    (struct sockaddr *) &from_addr, &addr_length);
-
-		hope(-1 != recv_length, strerror(errno));
-		hope(check_response(dst, msg),
-		    "response did not match query");
-
-		close(sd);
-		return dst + recv_length;
-	}
-	close(sd);
-	nohope("request timed out");
-
-	return NULL;
-#endif /* !defined(HAVE_RES_SEND) || !HAVE_DECL__RES_NSADDR_LIST */
+#else /* !USE_RES_SEND */
+	if (use_tcp)
+		return dns_send_addr_tcp(dst, msg, msglen, addr);
+	else
+		return dns_send_addr_udp(dst, msg, msglen, addr);
+#endif /* !USE_RES_SEND */
 }

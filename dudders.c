@@ -65,7 +65,9 @@ void
 usage()
 {
 	printf("%s\n\nReport bugs to <%s>.\n",
-	    "Usage:\n  dudders [-k KEYFILE] [-n KEYNAME] [-m MNAME] [-z ZONE] DOMAIN TTL ADDRESS\n\n"
+	    "Usage:\n"
+	    "dudders [-T] [-k KEYFILE] [-n KEYNAME] [-m MNAME] [-z ZONE]"
+	    " DOMAIN TTL ADDRESS\n\n"
 	    "Sign a DNS UPDATE of DOMAIN to ADDRESS with KEYFILE.",
 	    PACKAGE_BUGREPORT);
 }
@@ -88,7 +90,7 @@ static struct in_addr addr;      // address for DOMAIN's new A RR
 static char* zone;               // DOMAIN's zone
 static char* mname;              // ZONE's primary name server
 struct sockaddr_in ns_addr;      // MNAME's IP address
-
+static int use_tcp;              // true to use TCP/IP
 
 /* Try to infer the key name from a dnssec-keygen(8) style private key
  * file's name in `filename', and copy the result to `keyname'.
@@ -115,8 +117,11 @@ void
 parse_options(int argc, char **argv)
 {
 	int c;
-	while (-1 != (c = getopt(argc, argv, "k:n:m:z:"))) {
+	while (-1 != (c = getopt(argc, argv, "Tk:n:m:z:"))) {
 		switch (c) {
+		case 'T':
+			use_tcp = 1;
+			break;
 		case 'k':
 			key_filename = optarg;
 			keyfile = fopen(optarg, "r");
@@ -252,6 +257,7 @@ main(int argc, char *argv[])
 		hope2(NS_MAXDNAME >= strlen(zone), zone,
 		    "zone domain too long");
 	}
+	hope(mname && zone, "could not find zone");
 	get_ns_addr();
 
 	// initialise key
@@ -270,7 +276,7 @@ main(int argc, char *argv[])
 	dst = sign_dnsupdate_message(dst, qbuf, keyname);
 
 	// send update request
-	dst = dns_send_addr(ansbuf, qbuf, dst - qbuf, &ns_addr);
+	dst = dns_send_addr(ansbuf, qbuf, dst - qbuf, &ns_addr, use_tcp);
 	free(qbuf);
 	check_dnsupdate_response(ansbuf, dst - ansbuf);
 	free(ansbuf);
