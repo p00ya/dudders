@@ -1,3 +1,7 @@
+Noteworthy changes in dudders-1.04
+
+ - The update message can be sent over TCP, with the -T option.
+
 Noteworthy changes in dudders-1.03
 
  - The TTL argument is actually applied instead of the 86400 default.
