@@ -1,0 +1,22 @@
+body {
+	width: 40em;
+	padding-left: 100px;
+}
+
+p {
+	text-align: justify;
+}
+
+pre {
+	width: 80en;
+	padding: 1em;
+	border: 1px solid #ccc;
+	font-size: smaller;
+	overflow: auto;
+	white-space: pre-wrap;
+}
+
+ins {
+	text-decoration: none;
+	color: #006400;
+}

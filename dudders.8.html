@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>dudders(8) &laquo; System Manager's Manual</title>
+    <link rel="stylesheet" type="text/css" href="man.css"/>
+  </head>
+  <body>
+    <div id="header">
+      <h1 class="left">DUDDERS(8)</h1><div class="right">DUDDERS(8)</div><div class="centre">System Manager's Manual</div>
+    </div>
+    <h2>NAME</h2>
+    <p>dudders &mdash; update DNS record</p>
+    <h2>SYNOPSIS</h2>
+    <div class="usage">
+      <span class="command">dudders</span>
+      [-t]
+      [-k <span class="param">PRIVKEY</span>]
+      [-n <span class="param">KEYNAME</span>]
+      [-m <span class="param">MNAME</span>]
+      [-z <span class="param">ZONE</span>]
+      <span class="param">DOMAIN</span>
+      <span class="param">TTL</span>
+      <span class="param">ADDRESS</span>
+    </div>
+    <h2>DESCRIPTION</h2>
+
+<p>Perform a DNS update request to set <span class="param">DOMAIN</span>'s A
+record to <span class="param">ADDRESS</span>, with <span
+class="param">TTL</span> seconds to live, overwriting any previous A records for
+the domain in the Internet class.  An RSA private key is loaded from standard input,
+or from the file <span class="param">PRIVKEY</span>.  The update is sent to the
+zone's master server, and authenticated with SIG(0) using the private key's
+signature.</p>
+
+<p>If the filename <span class="param">PRIVKEY</span> is provided and
+it is in the <span class="command xref">dnssec-keygen</span>(8)
+format, the keyname can be inferred from the filename. Otherwise, the
+keyname must be provided via the <span class="param">KEYNAME</span>
+option.</p>
+
+<p>The
+<span class="param">MNAME</span> and
+<span class="param">ZONE</span> options can be used to
+override the authority for testing purposes.  If either of these
+options are not specified, the leading labels are stripped away from
+<span class="param">DOMAIN</span> until an SOA record is found, and
+the missing values are filled from the SOA response.</p>
+
+<p>The private key must be in the format generated
+by <span class="command xref">dnssec-keygen</span>(8) using the
+"<span class="usage">-a RSAMD5</span>" option.  The reference key
+format uses colon-separated key value pairs and base64-encoded
+unsigned multiprecision integer key components.</p>
+
+<h2>DIAGNOSTICS</h2>
+
+<p>The <span class="command">dudders</span> utility exits with 0 iff
+the server reports that the update was successful.</p>
+
+<p>A DNS Server Failure error may indicate that
+<span class="param">PRIVKEY</span> is not authorised for signing
+transactions for <span class="param">DOMAIN</span>, or that the master
+server does not support the update protocol.</p>
+
+<h2>OPTIONS</h2>
+<dl>
+<dt class="usage">-T</dt>
+<dd><p>Send update message over TCP (default is UDP).</p></dd>
+
+<dt class="usage">-k <span class="param">PRIVKEY</span></dt>
+<dd><p>Look in the file <span class="param">PRIVKEY</span> for the private
+key.</p></dd>
+
+<dt class="usage">-n <span class="param">KEYNAME</span></dt>
+<dd><p>Use the fully qualified domain name <span class="param">KEYNAME</span> to
+identify the key.</p></dd>
+
+<dt class="usage">-m <span class="param">MNAME</span></dt>
+<dd><p>Assume the (authoritative) master server is the domain name
+<span class="param">MNAME</span>.</p></dd>
+
+<dt class="usage">-z <span class="param">ZONE</span></dt>
+<dd><p>Assume that the fully qualified domain name
+<span class="param">ZONE</span> is authoritative for
+<span class="param">DOMAIN</span>.</p>
+
+<dt class="usage">--help</dt>
+<dd><p>Output a brief help message and exit.</p></dd>
+
+<dt class="usage">--version</dt>
+<dd><p>Output version information and exit.</p></dd>
+</dl>
+
+<h2>LIMITATIONS</h2>
+<p>Wildcards are not supported for <span class="param">DOMAIN</span>.</p>
+
+<p>Only RSA/MD5 keys/signatures are supported.</p>
+
+<p>Only A records within the Internet class are supported.</p>
+
+<h2>SEE ALSO</h2>
+<ul>
+  <li><span class="command xref">nsupdate</span>(8)</li>
+  <li><span class="command xref">dnssec-keygen</span>(8)</li>
+  <li><a href="http://www.ietf.org/rfc/rfc1035.txt">RFC1035</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc2535.txt">RFC2535</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc2537.txt">RFC2537</a></li>
+  <li><a href="http://www.ietf.org/rfc/rfc2931.txt">RFC2931</a></li>
+</ul>
+<h2>AUTHOR</h2>
+<p><span class="command">dudders</span> and its manual page were written by Dean
+Scarff.</p>
+
+<p>Report bugs via the project website &lt;<a href="https://github.com/p00ya/dudders">https://github.com/p00ya/dudders</a>&gt;</p>
+</body>
+</html>

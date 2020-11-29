@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>dudders &mdash; home router dynamic DNS HOWTO</title>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    <meta name="description" content="How to set up a BIND 9 server and dudders on your home router for dynamic DNS updates" />
+    <meta name="author" content="Dean Scarff" />
+  </head>
+  <body>
+    <h1>dudders &mdash; home router HOWTO</h1>
+    <p>This page explains how to set up a BIND 9 server and <a href="https://p00ya.github.io/dudders">dudders</a> on your home router to dynamically update a DNS record.</p>
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#background">Background</a></li>
+      <li><a href="#howto">HOWTO</a>
+	<ul>
+	  <li><a href="#keygen">Key generation</a></li>
+	  <li><a href="#bind-conf">BIND configuration</a></li>
+	  <li><a href="#zone-conf">Zone configuration</a></li>
+	  <li><a href="#nsupdate">Testing with nsupdate</a></li>
+	  <li><a href="#dudders">Updating with dudders</a></li>
+	  <li><a href="#auto">Automatically running dudders when your IP address changes</a></li>
+	</ul>
+      </li>
+    </ul>
+    <h2 id="background">Background</h2>
+    <p>This section explains at a basic level the technologies dudders uses, and why you might want to use dudders.  Skip this section if you already know how DNS UPDATE works.</p>
+    <p>A computer on the internet is identified by an <q><acronym title="internet protocol">IP</acronym> address</q>.  For home networks, this address is assigned to a router or modem by an <acronym title="internet service providers">ISP</acronym> (the telecommunications company you pay for internet access).  Many ISPs frequently change the particular IP address they assign to a home connection: this practice is often described as assigning a <q>dynamic IP address</q>.</p>
+    <p>You may wish to connect directly to your home network from a remote location: for example, to upload a file to a home server.  Accessing your home network through the internet requires you to know the dynamic IP address assigned by your ISP.  Some ISPs make it available via their websites, or you could write it down, or even just remember it as you leave the house.  However, if your home connection drops temporarily, it's possible the address could change!</p>
+    <p>An IP address is just a number, such as <code>192.0.32.10</code>.  Most people on the internet are used to accessing machines using the Domain Name System.  A type of <acronym title="domain name system">DNS</acronym> record called an <q>A record</q> associates a domain name (e.g. <code>home.dynamic.net</code>) to an IP address.  If you have registered your own domain name (e.g. <code>dynamic.net</code>), it may be convenient to set up a subdomain like "<code>home</code>" to point to your home address.  This is easier to remember than a 4-octet IP address, but it still doesn't solve the problem of being up-to-date.  You need your home modem or router to update the A record whenever your home connection gets a new address.</p>
+    <p>Dudders is a program with a command-line interface that allows your computer (or router) to securely update a domain name to point to a dynamic IP address.  Your home router sends a DNS packet to the DNS server responsible for your domain with your home's new address, whenever your router reconnects to the internet.  This lets you connect to your home computers from anywhere in the world, using an easy-to-remember domain name like <code>home.dynamic.net</code>.</p>
+    <p>Dudders uses an extension to the DNS protocol that allows a DNS zone to be updated.  This extension, DNS UPDATE, was standardised by the <acronym title="internet engineering taskforce">IETF</acronym>, the same group that publishes the DNS protocol.  The DNS UPDATE extension is secure, efficient, and supported by BIND, one of the most popular DNS server implementations.</p>
+    <h2 id="howto">HOWTO</h2>
+    <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND.  This HOWTO assumes you have access to that DNS server, and a computer with BIND's tools such as nsupdate and dnssec-keygen.</p>
+    <h3 id="keygen">Key generation</h3>
+    <p>You need to generate a key for SIG(0), using the RSA/MD5 algorithm.  You can generate it with the dnssec-keygen program distributed with BIND.  We generate a key that "belongs" to the router called "myrouter" in the example.</p>
+    <ul>
+      <li>You must use the <code>-T KEY</code> option for SIG(0).</li>
+      <li>You must use the <code>RSAMD5</code> algorithm (it must use RSA for SIG(0), and other digest algorithms will not yet work with dudders).  The example uses a 512-bit RSA/MD5 key.</li>
+      <li>You need to name the key like a subdomain of <code>dynamic.net</code>.  This example uses <code>myrouter.dynamic.net.</code></li>
+    </ul>
+    <pre class="command">
+dnssec-keygen -a RSAMD5 -T KEY -n HOST -b 512 myrouter.dynamic.net.
+</pre>
+    <p>This will produce two files, something like <code>Kmyrouter.dynamic.net.+001+32086.key</code> and <code>Kmyrouter.dynamic.net.+001+32086.private</code> (the 32086 part may be different).</p>
+    <p>You can read about <a href="http://www.isc.org/files/arm96.html#id2550759">generating keys</a> in the BIND manual.</p>
+    <h3 id="bind-conf">BIND configuration</h3>
+    <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND on the server <code>ns1.dynamic.net</code>.  The BIND configuration will be in a file similar to <code>/etc/named.conf</code> or <code>/etc/bind/named.conf</code>, or possibly a file included by one of those two.  The <code>zone</code> statement in that file will be similar to:</p>
+    <pre class="filecontents bind">
+zone "dynamic.net" IN {
+        type master;
+        file "db.dynamic.net";
+};
+</pre>
+    <p>You should edit the <code>zone</code> statement to include an <code>update-policy</code> statement:</p>
+    <pre class="filecontents bind">
+zone "dynamic.net" IN {
+        type master;
+        file "db.dynamic.net";
+<ins>        update-policy {
+                # allow "myrouter" to update the A record of "home"
+                grant myrouter.dynamic.net. name home.dynamic.net. A;
+        };</ins>
+};
+</pre>
+    <p>You can read more in the BIND administrator's manual about <a href="http://www.isc.org/files/arm96.html#dynamic_update">dynamic updates</a>.</p>
+    <h3 id="zone-conf">Zone configuration</h3>
+    <p>You need to add the A record for your home domain name, and the KEY record for your key to your zone.  The appropriate zone entry for the KEY record is contained in the <code>Kmyrouter.dynamic.net.+001+32086.key</code> generated earlier.  After adding the entries, the file <code>db.dynamic.net</code> should look something like:</p>
+<pre class="filecontents zone">
+$TTL 86400
+dynamic.net.         IN SOA  ns1.dynamic.net. me.dynamic.net. (
+                                2010082601 ; serial
+                                86400      ; refresh (1 day)
+                                7200       ; retry (2 hours)
+                                4838400    ; expire (8 weeks)
+                                10800      ; minimum (3 hours)
+                                )
+; existing NS, MX, A and other records...
+<ins>
+home.dynamic.net.     IN A 127.0.0.2
+myrouter.dynamic.net. IN KEY 512 3 1 AwEAAbVKdizHlpi3k4f/p/yDblpSwcb32Ti9FhEIwk5wvI1pC4RU56m0 vJYKKQxmAbt54YfWGQnV4/lmkIiDhTl9VtM=</ins>
+</pre>
+    <h3 id="nsupdate">Testing with nsupdate</h3>
+    <p>Before using dudders, you may wish to test your configuration with nsupdate.  nsupdate is distributed with BIND but some OS distributions package it separately; e.g. in debian, it is called <a href="http://packages.debian.org/unstable/dnsutils">dnsutils</a>, in gentoo it is called <a href="http://packages.gentoo.org/package/net-dns/bind-tools">bind-tools</a>.  You should force BIND to reload its configuration file after the changes above.  Then run:</p>
+    <pre class="command">
+nsupdate -k Kmyrouter.dynamic.net.+*.private &lt;&lt; EOF
+server ns1.dynamic.net.
+zone dynamic.net.
+update delete home.dynamic.net A
+update add home.dynamic.net 86400 A 127.0.0.3
+send
+EOF
+</pre>
+    <p>You should then be able to query the new A record</p>
+    <pre class="command">
+ host home.dynamic.net ns1.dynamic.net
+<span class="output">
+Using domain server:
+Name: ns1.dynamic.net
+Address: 10.0.0.1#53
+Aliases: 
+
+home.dynamic.net has address 127.0.0.3</span>
+</pre>
+    <h3 id="dudders">Updating with dudders</h3>
+    <p>If nsupdate worked, you should be able to use dudders too!</p>
+    <p>If you haven't already, download the latest version of dudders from the GitHub <a href="https://github.com/p00ya/dudders/releases">releases page</a>.  There may be a pre-built binary for your platform, or you can build from source.</p>
+    <p>Once dudders is installed, try running it with your new keys:</p>
+    <pre class="command">
+dudders -k Kmyrouter.dynamic.net.+*.private -m ns1.dynamic.net -z dynamic.net home.dynamic.net 86400 127.0.0.14
+</pre>
+    <p>If dudders exits with status 0 and no output, it has successfully updated the record.</p>
+    <h3 id="auto">Automatically running dudders when your IP address changes</h3>
+    <p>If your router is assigned a dynamic IP address every time it reconnects to a network, you should run dudders every time the network interface is brought up, or every time the daemons responsible for obtain the IP address are executed.</p>
+    <p>Unfortunately this is very distribution-specific.  Most distributions have a directory containing scripts that are run after network interfaces are brought up; it may be something like <code>/etc/hotplug.d</code>, <code>/etc/network/if-up.d</code>, or <code>/etc/ppp/ip-up.d</code>.  You should drop a shell-script into the appropriate directory that runs dudders as above (with the appropriate IP address, of course).  One caveat is that dudders should be run <strong>after the system has acquired the correct time</strong>, e.g. after <code>ntpdate</code> or similar NTP clients.</p>
+    <p>If you use OpenWRT, the official OpenWRT dudders package comes with its own hotplug script, so all you have to do is edit <code>/etc/config/dudders</code>.</p>
+    <h4>PPP</h4>
+    <p>If you have a DSL, cable, or dialup modem, it probably establishes a connection using <acronym title="point-to-point protocol">PPP</acronym>.  In this case, the dynamic IP address is re-assigned via <acronym title="interet protocol control protocol">IPCP</acronym> every time the PPP connection is established.</p>
+    <p>pppd by default runs <code>/etc/ppp/ip-up</code> with the remote IP address as the 5th parameter.  You can read more about PPPd's ip-up script in the <a href="http://linux.die.net/man/8/pppd">pppd(8) manual</a>.  A script such as the following could be used:</p>
+    <pre class="script">
+TTL=86400
+SERVER=ns1.dynamic.net
+ZONE=dynamic.net
+HOSTNAME=home.dynamic.net
+KEYFILE=/path/to/Kmyrouter.dynamic.net.+001+32086.private
+        
+if [ -n "$5" ] ; then
+  dudders -k $KEYFILE -m SERVER -z $ZONE $HOSTNAME $TTL $5
+fi
+    </pre>
+
+    <h4>DHCP</h4>
+    <p>If your IP is assigned via <acronym title="dynamic host configuration protocol">DHCP</acronym> as opposed to IPCP, you can call dudders from the DHCP client's exit hook.  The ubiquitous dhclient DHCP client executes the file <code>/etc/dhclient-exit-hooks</code> with the <code>new_ip_address</code> set in the environment.  You can therefore use a script like:</p>
+    <pre class="script">
+TTL=86400
+SERVER=ns1.dynamic.net
+ZONE=dynamic.net
+HOSTNAME=home.dynamic.net
+KEYFILE=/path/to/Kmyrouter.dynamic.net.+001+32086.private
+        
+if [ -n "$new_ip_address" ] ; then
+  dudders -k $KEYFILE -m SERVER -z $ZONE $HOSTNAME $TTL $new_ip_address
+fi
+    </pre>
+    <p>You can read more about dhclient's hooks in the <a href="http://linux.die.net/man/8/dhclient-script">dhclient-script(8)</a> manual page.</p>
+    <h4>Determining the Internet address</h4>
+    <p>When using hooks for PPPd or dhclient, your script will be fortunate enough to have the IP address available as an environment variable or command-line parameter.  However, in some cases it may be necessary (or even more reliable) to infer the dynamic IP address from routing information.</p>
+    <p>Usually on a modem/router, the default route is the internet IP address assigned by the ISP.  One trick to get the IP address from a shell-script is to process the output of <code>route -n</code> (to get the interface) and <code>ifconfig</code> (to get the address) with <code>awk</code> or similar.  However, beware that this output is not standardised!  Here's how it works on OpenWRT:</p>
+    <pre class="command">
+# get the network interface from the default route:
+interface=$(route -n 2&gt;&amp;- |grep '^0.0.0.0' |sed -e 's/.* \([^ ]\+\)$/\1/')
+# get the IP address:
+ifconfig "$interface" |grep -o 'addr:[^ ]\+' |sed -e 's/addr://'
+    </pre>
+  </body>
+</html>

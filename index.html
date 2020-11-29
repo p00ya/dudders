@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>dudders &mdash; a utility for updating DNS records</title>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+  </head>
+  <body>
+    <h1>dudders</h1>
+    <h2>Users</h2>
+    <p>Dudders is a utility for updating DNS records.</p>
+    <p>Dudders spells "Dynamically <a
+    href="http://www.ietf.org/rfc/rfc2136.txt">Updating DNS</a> Duly Embracing
+    <a href="http://www.ietf.org/rfc/rfc2931.txt">RSA SIG(0)</a>" (with some
+    poetic license).  It points a domain name to a given IP address, using a
+    DNS message secured by public-key cryptography.  Dudders utilises the
+    <a href="http://www.ietf.org/rfc/rfc2136.txt">DNS UPDATE</a> protocol to
+    update a DNS <q>A record</q>, and a
+    <a href="http://www.ietf.org/rfc/rfc2931.txt">SIG(0)</a> signature to
+    provide cryptographic security. It is designed with embedded systems (such
+    as
+    <a href="http://www.openwrt.org">OpenWRT</a> and
+    <a href="http://www.freewrt.org">FreeWRT</a>) in mind.
+    This has several implications for users:</p>
+    <ul>
+      <li>you can't use it do do all the things DNS UPDATE can do,</li>
+      <li>it will error and exit rather than dealing with problems;</li>
+      <li>it will fit and work on your embedded device!</li>
+    </ul>
+    <p>For a general purpose DNS UPDATE utility where space is not a concern,
+    use ISC's nsupdate, which is distributed with
+    <a href="http://www.isc.org/products/BIND/">BIND</a>.  Other free clients
+    with similar functionality to update an A record (without necessarily
+    using the DNS UPDATE protocol) include:</p>
+    <ul>
+      <li><a rel="nofollow" href="http://ddclient.sourceforge.net">ddclient</a>,</li>
+      <li><a rel="nofollow" href="http://ez-ipupdate.com/">ez-ipupdate</a>,</li>
+      <li><a rel="nofollow" href="http://updatedd.philipp-benner.de/">updatedd</a>,</li>
+      <li><a rel="nofollow" href="http://ipupdate.sourceforge.net">ipupdate</a>, and</li>
+      <li><a rel="nofollow" href="http://dnssec-tools.sourceforge.net">dnssec-tools</a>'s
+      ifup-dyndns</li>
+    </ul>
+    <h2>Documentation</h2>
+    <p>For a verbose tutorial on getting started with dudders, read the <a href="howto.html">dynamic DNS HOWTO</a>.  For more a concise description of how to invoke the program, consult the <a
+    href="dudders.8.html">dudders manual page</a>.</p>
+    <p>The ISC BIND 9 Administrator Reference Manual contains instructions for
+    configuring your zone's DNS server to support a SIG(0) update, under the <a
+    href="https://www.isc.org/software/bind/documentation/arm95#DNSSEC">DNSSEC
+    section</a>.</p>
+    <h2>License</h2>
+    <p>Dudders is Copyright &copy; 2007, 2008, 2010 <a href="http://scarff.id.au/">Dean Scarff</a></p>
+    <p>Dudders is Licensed under the <a
+    href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version
+    2.0</a> (the "License").</p>
+    <p>Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an <strong>"as is" basis,
+    without warranties or conditions of any kind</strong>, either express or
+    implied.  See the License for the specific language governing permissions
+    and limitations under the License.</p>
+    <h2>Contact</h2>
+    <p>You can download the source and file bugs on <a
+    href="https://github.com/p00ya/dudders">github</a>.</p>
+  </body>
+</html>

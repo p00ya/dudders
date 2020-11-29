@@ -1,0 +1,15 @@
+#header { width: 100%; clear: none; font-weight: bold; }
+#header > * { clear: none; display: block; }
+#header > *.left { float: left; text-align: left; }
+#header > *.right { float: right; text-align: right; }
+#header > *.centre { width: 100%; text-align: center; }
+body { padding-left: 5%; padding-right: 5%; }
+div.usage { background: #ccc; }
+.usage { font-family: monospace; }
+.param { font-style: italic; }
+.command { font-weight: bold; }
+.xref { text-decoration: underline; }
+p { text-align: justify }
+h1 { font-size: inherit; margin: 0 }
+h2 { font-size: large }
+.nodisplay { display: none }
