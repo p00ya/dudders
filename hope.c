@@ -16,7 +16,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -28,12 +28,11 @@
 const char *program_invocation = "";
 
 #ifndef NDEBUG
-# define FL , const char* file, unsigned line
-# define PFL()						\
-	fprintf(stderr, "(From %s:%u)\n", file, line)
+#define FL , const char *file, unsigned line
+#define PFL() fprintf(stderr, "(From %s:%u)\n", file, line)
 #else
-# define FL
-# define PFL()
+#define FL
+#define PFL()
 #endif
 
 #pragma GCC visibility push(hidden)
@@ -58,8 +57,8 @@ xmalloc_(size_t size FL)
 {
 	void *p = malloc(size);
 	if (!p) {
-		fprintf(stderr, "%s: %s\n", program_invocation,
-		    strerror(errno));
+		fprintf(
+		    stderr, "%s: %s\n", program_invocation, strerror(errno));
 		PFL();
 		exit(EXIT_FAILURE);
 	}

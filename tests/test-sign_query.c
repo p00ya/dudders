@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "hope.h"
 #include "crypt.h"
+#include "hope.h"
 #include "test.h"
 
 int
@@ -42,10 +42,8 @@ main(int argc, char *argv[])
 	    0x6e == buf[test_query_footprint_offset + 1]) ||
 	    iabort();
 
-	char *end = (char *)sign_query((unsigned char *)buf +
-	    test_query_size,
-	    buf,
-	    buf + test_query_sig0_offset);
+	char *end = (char *)sign_query((unsigned char *)buf + test_query_size,
+	    buf, buf + test_query_sig0_offset);
 	(end - buf == correct_size) || iabort();
 	int d = memcmp(buf, ref, correct_size);
 	if (0 != d) {
@@ -56,7 +54,8 @@ main(int argc, char *argv[])
 		strcpy(fref, argv[0]);
 		strcat(fref, ".ref");
 		printf("FAIL.\nWriting calculated message to %s,\n"
-		    "reference message to %s\n", fme, fref);
+		       "reference message to %s\n",
+		    fme, fref);
 		FILE *f = fopen(fme, "w");
 		f || iabort();
 		fwrite(buf, end - buf, 1, f);

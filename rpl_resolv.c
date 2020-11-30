@@ -16,13 +16,13 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <string.h>
 
 #ifdef HAVE_ARPA_NAMESER_H
-# include <arpa/nameser.h>
+#include <arpa/nameser.h>
 #endif
 #include "rpl_nameser.h"
 
@@ -48,45 +48,39 @@ dn_skipname(const char *dnbegin, const char *eom)
 #endif /* !defined(HAVE_DN_SKIPNAME) */
 
 #ifndef HAVE_DN_COMP
-int dn_comp(const char *name, unsigned char *dn_enc, int length,
+int
+dn_comp(const char *name, unsigned char *dn_enc, int length,
     unsigned char **dnptrs, unsigned char **lastdnptr)
 {
 	// no compression is actually performed here
-        hope(name && strlen(name) <= NS_MAXCDNAME,
+	hope(name && strlen(name) <= NS_MAXCDNAME,
 	    "domain name exceeds limit"); // See RFC1035 3.1
 
 	unsigned char *dst = dn_enc;
-        for (;;) {
+	for (;;) {
 		unsigned char *d = dst;
 		const char *s = name;
-                while ('.' != *s && *s)
+		while ('.' != *s && *s)
 			*++d = *s++;
 
 		hope2(s - name <= NS_MAXLABEL, name,
 		    "domain name label exceeds limit"); //  RFC1035 2.3.1
-                *dst = (unsigned char)(s - name);
-                if (!*s) {
+		*dst = (unsigned char)(s - name);
+		if (!*s) {
 			// silently add root if name not dot-terminated
 			if (s != name)
 				*++d = 0;
 			return 1 + d - dn_enc;
-                }
+		}
 		dst = ++d;
 		name = ++s;
-        }
+	}
 }
 #endif /* !defined(HAVE_DN_COMP) */
 
 
 // See RFC1035 4.1.1 RCODE
 #ifndef HAVE_P_RCODE
-const char *rcode_strings[] = {
-	"No error",
-	"Format error",
-	"Server failure",
-	"Name error",
-	"Not implemented",
-	"Refused",
-	"Unknown"
-};
+const char *rcode_strings[] = { "No error", "Format error", "Server failure",
+	"Name error", "Not implemented", "Refused", "Unknown" };
 #endif /* !defined(HAVE_P_RCODE) */

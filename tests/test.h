@@ -16,21 +16,21 @@
  */
 
 #ifndef TEST_H
-# define TEST_H
+#define TEST_H
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-# ifdef NDEBUG
-#  undef NDEBUG
-# endif
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 
-# include <stdint.h>
-# include <stdlib.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 /* Like abort(3), but expression evaluates as 0. */
-# define iabort() (abort(), 0)
+#define iabort() (abort(), 0)
 
 /* Filename of dnssec-keygen format private key file. */
 const char *keyfile();

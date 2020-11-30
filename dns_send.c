@@ -16,7 +16,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <sys/types.h>
@@ -25,24 +25,24 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 
 #ifdef HAVE_ARPA_NAMESER_H
-# include <arpa/nameser.h>
+#include <arpa/nameser.h>
 #endif
-#include "rpl_nameser.h"
 #include <resolv.h>
+#include "rpl_nameser.h"
 
 #if defined(HAVE_RES_SEND) && HAVE_DECL__RES_NSADDR_LIST
-# define USE_RES_SEND 1
+#define USE_RES_SEND 1
 #else
-# define USE_RES_SEND 0
+#define USE_RES_SEND 0
 #endif
 
-#include <sys/select.h>
 #include <fcntl.h>
+#include <sys/select.h>
 
 #include "hope.h"
 
@@ -65,15 +65,15 @@ check_response(const unsigned char *dst, const unsigned char *msg)
 #if !USE_RES_SEND
 /* Like `dns_send_addr', but always use UDP. */
 static unsigned char *
-dns_send_addr_udp(unsigned char *dst, const unsigned char *msg,
-    size_t msglen, struct sockaddr_in *addr)
+dns_send_addr_udp(unsigned char *dst, const unsigned char *msg, size_t msglen,
+    struct sockaddr_in *addr)
 {
 	int sd;
 	sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	hope(-1 != sd, strerror(errno));
 
 	int err = fcntl(sd, F_SETFL, fcntl(sd, F_GETFL) | O_NONBLOCK);
-	err = connect(sd, (struct sockaddr *) addr, sizeof(*addr));
+	err = connect(sd, (struct sockaddr *)addr, sizeof(*addr));
 	hope(-1 != err, strerror(errno));
 
 	struct timeval timeout;
@@ -96,8 +96,7 @@ dns_send_addr_udp(unsigned char *dst, const unsigned char *msg,
 
 		length = recv(sd, dst, NS_PACKETSZ, 0);
 		hope(-1 != length, strerror(errno));
-		hope(check_response(dst, msg),
-		    "response did not match query");
+		hope(check_response(dst, msg), "response did not match query");
 
 		close(sd);
 		return dst + length;
@@ -110,15 +109,15 @@ dns_send_addr_udp(unsigned char *dst, const unsigned char *msg,
 
 /* Like `dns_send_addr', but always use TCP. */
 static unsigned char *
-dns_send_addr_tcp(unsigned char *dst, const unsigned char *msg,
-    size_t msglen, struct sockaddr_in *addr)
+dns_send_addr_tcp(unsigned char *dst, const unsigned char *msg, size_t msglen,
+    struct sockaddr_in *addr)
 {
 	int sd;
 	sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	hope(-1 != sd, strerror(errno));
 
 	int err;
-	err = connect(sd, (struct sockaddr *) addr, sizeof(*addr));
+	err = connect(sd, (struct sockaddr *)addr, sizeof(*addr));
 	hope(-1 != err, strerror(errno));
 
 	ssize_t length;
@@ -165,17 +164,15 @@ dns_send_addr(unsigned char *dst, const unsigned char *msg, size_t msglen,
 	// Some resolvers are erroneously reporting ETIMEDOUT even
 	// with a valid response.  We'll accept a packet providing it
 	// looks like a response has been written to the dst buffer.
-	if (-1 == i &&
-	    (ETIMEDOUT == errno || ECONNREFUSED == errno) &&
-	    check_response(dst, msg) &&
-	    0xff != dst[NS_HFIXEDSZ - 1])
+	if (-1 == i && (ETIMEDOUT == errno || ECONNREFUSED == errno) &&
+	    check_response(dst, msg) && 0xff != dst[NS_HFIXEDSZ - 1])
 		return dst + NS_HFIXEDSZ;
 
 	_res.nsaddr_list[0] = save;
 	_res.nscount = save_count;
 	hope(i != -1, strerror(errno));
 	return dst + i;
-#else /* !USE_RES_SEND */
+#else  /* !USE_RES_SEND */
 	if (use_tcp)
 		return dns_send_addr_tcp(dst, msg, msglen, addr);
 	else

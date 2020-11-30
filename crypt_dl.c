@@ -16,13 +16,13 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <dlfcn.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "hope.h"
 
@@ -34,24 +34,19 @@ static void (*crypt_finish_impl)();
 static void (*crypt_load_key_impl)(FILE *);
 static uint16_t (*crypt_footprint_impl)();
 static size_t (*crypt_sign_length_impl)();
-static char *(*crypt_sign_impl)(char *, const char*, size_t);
+static char *(*crypt_sign_impl)(char *, const char *, size_t);
 
 /* Return non-zero iff all the impl pointers are set. */
-static
-int
+static int
 have_all()
 {
-	return crypt_init_impl &&
-	    crypt_finish_impl &&
-	    crypt_load_key_impl &&
-	    crypt_footprint_impl &&
-	    crypt_sign_length_impl &&
-	    crypt_sign_impl;
+	return crypt_init_impl && crypt_finish_impl && crypt_load_key_impl &&
+	       crypt_footprint_impl && crypt_sign_length_impl &&
+	       crypt_sign_impl;
 }
 
 /* Set all implementation pointers to NULL. */
-static
-void
+static void
 reset_all()
 {
 	crypt_init_impl = NULL;

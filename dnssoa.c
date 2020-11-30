@@ -16,17 +16,17 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include <netinet/in.h>
 #ifdef HAVE_ARPA_NAMESER_H
-# include <arpa/nameser.h>
+#include <arpa/nameser.h>
 #endif
 #include "rpl_nameser.h"
 
@@ -54,14 +54,12 @@ check_dn_soa(int dnlen, const unsigned char *dn, const unsigned char *eom)
 
 // See dnssoa.h
 void
-dnssoa_parse(char *zone, char *mname,
-    const unsigned char *response, size_t rlen)
+dnssoa_parse(
+    char *zone, char *mname, const unsigned char *response, size_t rlen)
 {
 	*mname = 0;
-	hope(NS_HFIXEDSZ < rlen,
-	    "server returned incomplete SOA response");
-	hope(NS_PACKETSZ >= rlen,
-	    "SOA response unexpectedly large");
+	hope(NS_HFIXEDSZ < rlen, "server returned incomplete SOA response");
+	hope(NS_PACKETSZ >= rlen, "SOA response unexpectedly large");
 	const unsigned char *eom = response + rlen;
 
 	uint16_t flags = ns_get16(response + 2);
@@ -81,7 +79,8 @@ dnssoa_parse(char *zone, char *mname,
 	const unsigned char *authority = response + NS_HFIXEDSZ;
 	int dnlen = dn_skipname(authority, eom);
 	authority = check_dn_soa(dnlen, authority, eom);
-	if (!authority) return;
+	if (!authority)
+		return;
 
 	dnlen = dn_expand(response, eom, authority, zone, NS_MAXDNAME);
 	const unsigned char *dmname = check_dn_soa(dnlen, authority, eom);

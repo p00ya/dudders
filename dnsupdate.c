@@ -16,7 +16,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <sys/types.h>
@@ -24,19 +24,19 @@
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
-#include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #ifdef HAVE_ARPA_NAMESER_H
-# include <arpa/nameser.h>
+#include <arpa/nameser.h>
 #endif
-#include "rpl_nameser.h"
 #include <resolv.h>
+#include "rpl_nameser.h"
 #include "rpl_resolv.h"
 
 #include "crypt.h"
@@ -51,8 +51,7 @@ static unsigned char *names[5]; // dn_comp dnptrs
 
 /* Copy `length' octets from `src' to `dst'.  Return value is first
  * octet after the copied data. */
-static inline
-char *
+static inline char *
 wire_direct(char *dst, const char *src, size_t length)
 {
 	memcpy(dst, src, length);
@@ -61,8 +60,7 @@ wire_direct(char *dst, const char *src, size_t length)
 
 /* Copy `u' to `dst' in network byte order.  Return the position in
  * `dst' after `u'.  The buffer should hold 2 octets. */
-static inline
-char *
+static inline char *
 wire_short(char *dst, uint16_t u)
 {
 	ns_put16(u, (unsigned char *)dst);
@@ -71,8 +69,7 @@ wire_short(char *dst, uint16_t u)
 
 /* Copy `u' to `dst' in network byte order.  Return the position in
  * `dst' after `u'.  The buffer should hold 4 octets. */
-static inline
-char *
+static inline char *
 wire_long(char *dst, uint32_t u)
 {
 	ns_put32(u, (unsigned char *)dst);
@@ -87,8 +84,8 @@ wire_long(char *dst, uint32_t u)
 static char *
 wire_domain(char *dst, const char *name)
 {
-	int i = dn_comp(name, (unsigned char *)dst, NS_MAXCDNAME,
-	    names, names + sizeof(names));
+	int i = dn_comp(name, (unsigned char *)dst, NS_MAXCDNAME, names,
+	    names + sizeof(names));
 	hope(-1 != i, strerror(errno));
 	return dst + i;
 }
@@ -101,79 +98,78 @@ wire_domain(char *dst, const char *name)
 // character buffer approach avoids many annoying packing/endian
 // serialisation issues.
 
-enum {
+enum
+{
 	update_1_additional = 11, // LSB of additional record count
 };
 
 // dnsupdate header
-static const char update_1[] =
-{
-	0, 0, // id, to be overwritten
+static const char update_1[] = {
+	0, 0,    // id, to be overwritten
 	0x28, 0, // DNS_QUERY, DNS_OPCODE_UPDATE
-	0, 1, // 1 zone
-	0, 0, // 0 prerequisites
-	0, 2, // 2 update RRs (delete, add)
-	0, 1, // 1 additional RR (sig)
+	0, 1,    // 1 zone
+	0, 0,    // 0 prerequisites
+	0, 2,    // 2 update RRs (delete, add)
+	0, 1,    // 1 additional RR (sig)
 };
 
 // end of zone section
-static const char update_2[] =
-{
+static const char update_2[] = {
 	0, ns_t_soa, // type
 	0, ns_c_in,  // class
 };
 
-enum {
+enum
+{
 	update_3_domain = 10,
 	update_3_ttl = 16,
 	update_3_addr = 22,
 };
 
-static const char update_3[] =
-{
+static const char update_3[] = {
 	// update delete
-	0, ns_t_a, // type
+	0, ns_t_a,   // type
 	0, ns_c_any, // class
-	0, 0, 0, 0, // ttl (delete request)
-	0, 0, // rdlength: no rdata
+	0, 0, 0, 0,  // ttl (delete request)
+	0, 0,        // rdlength: no rdata
 
 	// update add
 	NS_CMPRSFLGS, 0, // compressed name, to be overwritten
-	0, ns_t_a, // type
-	0, ns_c_in, // class
-	0, 0, 0, 0, // ttl, to be overwritten
-	0, 4, // rdlength
-	0, 0, 0, 0, // ip address, to be ovewritten
+	0, ns_t_a,       // type
+	0, ns_c_in,      // class
+	0, 0, 0, 0,      // ttl, to be overwritten
+	0, 4,            // rdlength
+	0, 0, 0, 0,      // ip address, to be ovewritten
 };
 
-enum {
+enum
+{
 	update_4_rdlength = 9, // offset of rdata length
 	update_4_rdata = 11,
-	update_4_sigexpire = 11 + NS_SIG_EXPIR, // expiry time
+	update_4_sigexpire = 11 + NS_SIG_EXPIR,  // expiry time
 	update_4_sigincept = 11 + NS_SIG_SIGNED, // inception time
-	update_4_foot = 11 + NS_SIG_FOOT, // offset of key footprint
-	update_4_signer = 11 + NS_SIG_SIGNER, // offset of signer id
-	update_4_sig = 31, // offset of actual signature
-//	sig0_fixed_rdata = 20, // octets of fixed rdata
+	update_4_foot = 11 + NS_SIG_FOOT,        // offset of key footprint
+	update_4_signer = 11 + NS_SIG_SIGNER,    // offset of signer id
+	update_4_sig = 31,                       // offset of actual signature
 };
 
 static const char update_4[] = {
 	// sig
-	0, // name, not important
+	0,           // name, not important
 	0, ns_t_sig, // type
 	0, ns_c_any, // class
-	0, 0, 0, 0, // ttl
-	0, 0, // rdlength, to be overwritten
+	0, 0, 0, 0,  // ttl
+	0, 0,        // rdlength, to be overwritten
 
 	// rdata, see RFC2535 4.1 and NS_SIG_* in nameser.h
-	0, 0, // type flags
+	0, 0,          // type flags
 	NS_ALG_MD5RSA, // algorithm
-	0, // labels
-	0, 0, 0, 0, // original TTL
-	0, 0, 0, 0, // sig expiration, to be overwritten
-	0, 0, 0, 0, // sig inception, to be overwritten
-	0, 0, // key id (RFC2535 4.1.6), to be overwritten
-	// then signer's name
+	0,             // labels
+	0, 0, 0, 0,    // original TTL
+	0, 0, 0, 0,    // sig expiration, to be overwritten
+	0, 0, 0, 0,    // sig inception, to be overwritten
+	0, 0,          // key id (RFC2535 4.1.6), to be overwritten
+	               // then signer's name
 };
 
 // See dnsupdate.h
@@ -202,8 +198,7 @@ wire_dnsupdate_message(char *dst, const char *zone, const char *domain,
 
 // See dnsupdate.h
 char *
-sign_query(char *dst, const char *query,
-    const char *rr_start)
+sign_query(char *dst, const char *query, const char *rr_start)
 {
 	assert(query < rr_start && rr_start < dst);
 
@@ -222,8 +217,7 @@ sign_query(char *dst, const char *query,
 
 // See dnsupdate.h
 char *
-sign_dnsupdate_message(char *dst, const char *query,
-    const char *keyname)
+sign_dnsupdate_message(char *dst, const char *query, const char *keyname)
 {
 	char *rr_start = dst; // start of sig(0) record
 	wire_direct(dst, update_4, sizeof(update_4));
@@ -238,13 +232,14 @@ sign_dnsupdate_message(char *dst, const char *query,
 	names[1] = NULL;
 	dst = wire_domain(dst + update_4_signer, keyname);
 	dst = sign_query(dst, query, rr_start);
-	wire_short(rr_start + update_4_rdlength,
-	    dst - rr_start - update_4_rdata);
+	wire_short(
+	    rr_start + update_4_rdlength, dst - rr_start - update_4_rdata);
 
 	return dst;
 }
 
-enum {
+enum
+{
 	response_flags = 2, // offset of first flag octet
 };
 
@@ -263,6 +258,6 @@ check_dnsupdate_response(const unsigned char *response, size_t length)
 		anyset |= *r++;
 	hope(!anyset || !memcmp(update_1 + 4, response + 4, 8),
 	    "DNS UPDATE counts do not match query");
-	hope2(0 == (flags & 0x000f),
-	    "DNS UPDATE error", p_rcode(flags & 0x000f));
+	hope2(0 == (flags & 0x000f), "DNS UPDATE error",
+	    p_rcode(flags & 0x000f));
 }

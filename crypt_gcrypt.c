@@ -16,7 +16,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -41,14 +41,15 @@ static size_t modulus_length;
 /* RSA key sexp "(private-key (rsa ...))". */
 static gcry_sexp_t rsa_key;
 
-static int ksizes[PKFK_SIZE]; // key field sizes
+static int ksizes[PKFK_SIZE];   // key field sizes
 static char *kparts[PKFK_SIZE]; // key field values
 
 /* Hope an expression `e' of type `gcry_error_t' has non-error
  * status. */
-#define CHECK(e) {					\
-		gcry_error_t err = e;			\
-		hope(!err, gcry_strerror(err));		\
+#define CHECK(e)                                                              \
+	{                                                                     \
+		gcry_error_t err = e;                                         \
+		hope(!err, gcry_strerror(err));                               \
 	}
 
 // See crypt.h
@@ -66,8 +67,8 @@ crypt_init()
 	hope(!gcry_md_test_algo(GCRY_MD_MD5), "libgcrypt's MD5 unavailable");
 	hope(!gcry_pk_test_algo(GCRY_AC_RSA), "libgcrypt's RSA unavailable");
 	size_t usage = GCRY_PK_USAGE_SIGN;
-	hope(!gcry_pk_algo_info(GCRY_AC_RSA, GCRYCTL_TEST_ALGO,
-		NULL, &usage), "libgcrypt RSA can't sign");
+	hope(!gcry_pk_algo_info(GCRY_AC_RSA, GCRYCTL_TEST_ALGO, NULL, &usage),
+	    "libgcrypt RSA can't sign");
 #endif
 }
 
@@ -79,8 +80,7 @@ crypt_finish()
 }
 
 /* Store `data' to the appropriate `ksizes' and 'kparts' members. */
-static
-void
+static void
 load_line(enum pk_field_key field, const char *data)
 {
 	assert(PKFK_SIZE > field);
@@ -99,8 +99,7 @@ load_line(enum pk_field_key field, const char *data)
 
 /* Return the 1-based index of the first missing key-part, or 0 if all
  * required key parts were present. */
-static
-int
+static int
 check_kparts()
 {
 	for (int i = 0; i < PKFK_SIZE; ++i)
@@ -117,10 +116,10 @@ crypt_load_key(FILE *privkey)
 	hope(!check_kparts(), "private key missing parts");
 	// the primes are swapped and thus the CRT coefficient is invalid
 	gcry_mpi_t u, p, q;
-	gcry_mpi_scan(&q, GCRYMPI_FMT_USG,
-	    kparts[PKFK_PRIME1], ksizes[PKFK_PRIME1], NULL);
-	gcry_mpi_scan(&p, GCRYMPI_FMT_USG,
-	    kparts[PKFK_PRIME2], ksizes[PKFK_PRIME2], NULL);
+	gcry_mpi_scan(&q, GCRYMPI_FMT_USG, kparts[PKFK_PRIME1],
+	    ksizes[PKFK_PRIME1], NULL);
+	gcry_mpi_scan(&p, GCRYMPI_FMT_USG, kparts[PKFK_PRIME2],
+	    ksizes[PKFK_PRIME2], NULL);
 	hope(0 < gcry_mpi_cmp(q, p), "key primes out of order");
 	u = gcry_mpi_new(ksizes[PKFK_COEFFICIENT] * CHAR_BIT);
 	gcry_mpi_invm(u, p, q);
@@ -129,8 +128,8 @@ crypt_load_key(FILE *privkey)
 	    "(n %b) (e %b) (d %b) (p %m) (q %m) (u %m)))",
 	    ksizes[PKFK_MODULUS], kparts[PKFK_MODULUS],
 	    ksizes[PKFK_PUBLIC_EXPONENT], kparts[PKFK_PUBLIC_EXPONENT],
-	    ksizes[PKFK_PRIVATE_EXPONENT], kparts[PKFK_PRIVATE_EXPONENT],
-	    p, q, u);
+	    ksizes[PKFK_PRIVATE_EXPONENT], kparts[PKFK_PRIVATE_EXPONENT], p, q,
+	    u);
 
 	CHECK(gcry_pk_testkey(rsa_key));
 }
@@ -161,8 +160,8 @@ crypt_sign(char *dst, const char *src, size_t length)
 	unsigned char *digest = malloc(digest_length);
 	gcry_md_hash_buffer(GCRY_MD_MD5, digest, src, length);
 	CHECK(gcry_sexp_build(&data, NULL,
-	    "(data (flags pkcs1 no-blinding) (hash md5 %b))",
-		digest_length, digest));
+	    "(data (flags pkcs1 no-blinding) (hash md5 %b))", digest_length,
+	    digest));
 	CHECK(gcry_pk_sign(&sig, data, rsa_key));
 
 	s = gcry_sexp_find_token(sig, "s", 0);
@@ -171,7 +170,7 @@ crypt_sign(char *dst, const char *src, size_t length)
 	assert(NULL != sig_mpi);
 
 	CHECK(gcry_mpi_print(GCRYMPI_FMT_USG, (unsigned char *)dst,
-		modulus_length, &written, sig_mpi));
+	    modulus_length, &written, sig_mpi));
 	gcry_mpi_release(sig_mpi);
 	gcry_sexp_release(s);
 	gcry_sexp_release(sig);

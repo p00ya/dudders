@@ -16,11 +16,11 @@
  */
 
 #ifndef DNSSEND_H
-# define DNSSEND_H
+#define DNSSEND_H
 
-# ifdef HAVE_CONFIG_H
-#  include "config.h"
-# endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /* Send the `length' octets of the DNS message `msg' to the nameserver
  * at `addr'.  The response, if any, is written to `dst', and the
@@ -30,8 +30,7 @@
  *
  * The `dst' buffer should have a capacity of at least NS_PACKETSZ
  * octets. */
-unsigned char *dns_send_addr(unsigned char *dst,
-    const unsigned char *msg, size_t length,
-    struct sockaddr_in *addr, int use_tcp);
+unsigned char *dns_send_addr(unsigned char *dst, const unsigned char *msg,
+    size_t length, struct sockaddr_in *addr, int use_tcp);
 
 #endif /* !defined(DNSSEND_H) */

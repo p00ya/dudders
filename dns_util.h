@@ -16,14 +16,14 @@
  */
 
 #ifndef DNS_UTIL_H
-# define DNS_UTIL_H
+#define DNS_UTIL_H
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-#include <stdint.h>
 #include <resolv.h>
+#include <stdint.h>
 #include "rpl_resolv.h"
 
 #endif /* !defined(DNS_UTIL_H) */

@@ -23,15 +23,13 @@
 #include "hope.h"
 #include "test.h"
 
-static
-void
+static void
 test_cb(enum pk_field_key field, const char *data)
 {
 	if (PKFK_PUBLIC_EXPONENT == field) {
 		uint32_t x = 0;
-		decode64((char *) &x, data);
-		fprintf(stderr,
-		    "PublicExponent should be 0x10001: 0x%x\n", x);
+		decode64((char *)&x, data);
+		fprintf(stderr, "PublicExponent should be 0x10001: 0x%x\n", x);
 	}
 }
 

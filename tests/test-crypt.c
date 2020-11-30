@@ -31,16 +31,15 @@ main()
 	crypt_load_key(f);
 	fclose(f);
 	fprintf(stderr, "Key length should be %u: %u\n",
-	    (unsigned)test_modulus_size,
-	    (unsigned)crypt_sign_length());
+	    (unsigned)test_modulus_size, (unsigned)crypt_sign_length());
 	test_modulus_size == crypt_sign_length() || iabort();
-	fprintf(stderr, "Footprint should be 0x%hx: 0x%hx\n",
-	    test_footprint, crypt_footprint());
+	fprintf(stderr, "Footprint should be 0x%hx: 0x%hx\n", test_footprint,
+	    crypt_footprint());
 	test_footprint == crypt_footprint() || iabort();
 
 	unsigned char *buf = xmalloc(test_modulus_size);
-	unsigned char *end = (unsigned char *)crypt_sign((char*)buf,
-	    (char *)test_hash_payload, test_hash_payload_size);
+	unsigned char *end = (unsigned char *)crypt_sign(
+	    (char *)buf, (char *)test_hash_payload, test_hash_payload_size);
 	fprintf(stderr, "Signature should be %u octets: %u\n",
 	    (unsigned)test_modulus_size, (unsigned)(end - buf));
 	(test_modulus_size == end - buf) || iabort();

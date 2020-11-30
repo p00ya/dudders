@@ -16,20 +16,21 @@
  */
 
 #ifndef PARSE_PK_H
-# define PARSE_PK_H
+#define PARSE_PK_H
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-# include <stdio.h>
-# include <string.h>
-# include <stddef.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 /* RSA private key fields.  These numbers are guaranteed to be 0-based
  * and contiguous, suitable for a lookup table, but have no reliable
  * order, except that PKFK_SIZE is the greatest value. */
-enum pk_field_key {
+enum pk_field_key
+{
 	PKFK_MODULUS,
 	PKFK_PUBLIC_EXPONENT,
 	PKFK_PRIVATE_EXPONENT,
@@ -42,12 +43,11 @@ enum pk_field_key {
 };
 
 /* Callback function signature for parsing. */
-typedef void (parse_pk_cbf)(enum pk_field_key, const char *data);
+typedef void(parse_pk_cbf)(enum pk_field_key, const char *data);
 
 /* Number of octets required to decode the MIME base-64 sequence `str'
  * into. */
-inline
-size_t
+inline size_t
 decode64_length(const char *str)
 {
 	return 3 + strlen(str) * 3 / 4;

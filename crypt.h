@@ -16,15 +16,15 @@
  */
 
 #ifndef CRYPT_H
-# define CRYPT_H
+#define CRYPT_H
 
-# ifdef HAVE_CONFIG_H
-#  include "config.h"
-# endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-# include <stddef.h>
-# include <stdint.h>
-# include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
 /* Initialise the cryptography module. */
 void crypt_init();
