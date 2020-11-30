@@ -18,7 +18,7 @@
 # configure produces Makefile from Makefile.in.
 
 # automake config.
-AUTOMAKE_OPTIONS = foreign dist-bzip2 no-dist-gzip
+# See also AM_INIT_AUTOMAKE in configure.ac
 ACLOCAL_AMFLAGS = -I m4
 
 # targets.

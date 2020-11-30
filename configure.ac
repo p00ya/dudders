@@ -20,7 +20,7 @@ AC_INIT([dudders], [1.04], [https://github.com/p00ya/dudders])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign dist-bzip2 no-dist-gzip subdir-objects])
 AC_CONFIG_HEADER([config.h])
 
 # Extra directory targets.
