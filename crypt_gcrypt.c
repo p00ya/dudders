@@ -65,9 +65,9 @@ crypt_init()
 	gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
 #ifndef NDEBUG
 	hope(!gcry_md_test_algo(GCRY_MD_MD5), "libgcrypt's MD5 unavailable");
-	hope(!gcry_pk_test_algo(GCRY_AC_RSA), "libgcrypt's RSA unavailable");
+	hope(!gcry_pk_test_algo(GCRY_PK_RSA), "libgcrypt's RSA unavailable");
 	size_t usage = GCRY_PK_USAGE_SIGN;
-	hope(!gcry_pk_algo_info(GCRY_AC_RSA, GCRYCTL_TEST_ALGO, NULL, &usage),
+	hope(!gcry_pk_algo_info(GCRY_PK_RSA, GCRYCTL_TEST_ALGO, NULL, &usage),
 	    "libgcrypt RSA can't sign");
 #endif
 }
