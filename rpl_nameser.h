@@ -64,6 +64,10 @@
 #define NS_SIG_FOOT 16 /* RFC2535 4.1.6 */
 #endif
 
+#if !HAVE_DECL_NS_SIG_SIGNER
+#define NS_SIG_SIGNER 18 /* RFC2535 4.1.7 */
+#endif
+
 #if !HAVE_DECL_NS_ALG_MD5RSA
 #define NS_ALG_MD5RSA 1 /* RFC2535 3.2 */
 #endif
