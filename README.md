@@ -1,8 +1,6 @@
-dudders README
-==============
+# dudders
 
-Users
------
+## Users
 
 Dudders is a utility for updating DNS records.  It points a domain
 name to a given IP address, using the RFC2136 DNS UPDATE protocol and
@@ -29,20 +27,19 @@ manual page, which is built by configure.
 With some poetic license, dudders spells "Dynamically Updating DNS
 Duly Embracing RSA SIG(0)".
 
-License
--------
+## License
 
 Dudders is licensed under the Apache License, Version 2.0, the text of
 which is included in the file COPYING.
 
-Installation
-------------
+## Installation
 
 A POSIX-like standard C library is expected, complete with resolver.
 The BSD, uClibc, and glibc libraries should all work.
 
 An external library is required by dudders for cryptography.
 The following packages are supported to provide crypto libraries:
+
  - openssl: The OpenSSL project's libcrypto
  - gcrypt: The GnuPG spinoff crypto library libgcrypt
 
@@ -50,7 +47,9 @@ At runtime dudders will try to dynamically load each of these
 libraries using dlopen(3), until one works.  The behaviour can be
 modified slightly by calling configure with:
 
-  --with-dlcrypto=LIST
+```
+--with-dlcrypto=LIST
+```
 
 Where LIST is a whitespace separated list containing at least one of
 the packages above, specifying the order they should be tried at
@@ -60,7 +59,9 @@ and at least one at runtime.
 To use the system dynamic linker instead of dlopen, call configure
 with:
 
-  --with-crypto=PACKAGE
+```
+--with-crypto=PACKAGE
+```
 
 Where PACKAGE is one of the packages above.  This is less flexible, but
 more portable.
@@ -68,15 +69,13 @@ more portable.
 By default, the program is built with a meagre amount of debugging
 information.  To make it leaner, call configure with:
 
-  CFLAGS="-DNDEBUG -O2"
+```
+CFLAGS="-DNDEBUG -O2"
+```
 
 Consult the INSTALL file for additional instructions on building and
 installing dudders.
 
-Contact
--------
+## Contact
 
-Visit the dudders homepage at <http://dudders.sourceforge.net/>.
-
-General discussion should take place on the mailing list:
-<dudders-users@lists.sourceforge.net>.
+Visit the dudders homepage at <https://github.com/p00ya/dudders>.

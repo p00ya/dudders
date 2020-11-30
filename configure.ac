@@ -16,7 +16,7 @@ dnl Process this file with autoconf to produce a configure script.
 ## limitations under the License.
 
 AC_PREREQ(2.65)
-AC_INIT([dudders], [1.04], [dudders-bugs@lists.sourceforge.net])
+AC_INIT([dudders], [1.04], [https://github.com/p00ya/dudders])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
@@ -129,7 +129,7 @@ AC_CHECK_DECLS([RES_TIMEOUT,RES_DFLRETRY],[],[],dnl
 ]])
 
 # Output.
-AC_CONFIG_FILES([dudders.8 Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([configuration complete.])
