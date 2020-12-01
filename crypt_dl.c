@@ -62,10 +62,10 @@ crypt_find_module()
 {
 	const char *modules[CRYPT_DL_COUNT];
 #ifdef CRYPT_DL_OPENSSL
-	modules[CRYPT_DL_OPENSSL] = PLUGIN_DIR "/crypt_openssl.so";
+	modules[CRYPT_DL_OPENSSL] = PLUGIN_DIR "/crypt_openssl" LT_MODULE_EXT;
 #endif
 #ifdef CRYPT_DL_GCRYPT
-	modules[CRYPT_DL_GCRYPT] = PLUGIN_DIR "/crypt_gcrypt.so";
+	modules[CRYPT_DL_GCRYPT] = PLUGIN_DIR "/crypt_gcrypt" LT_MODULE_EXT;
 #endif
 	for (int i = 0; i < CRYPT_DL_COUNT; ++i) {
 		dl = dlopen(modules[i], RTLD_LAZY | RTLD_LOCAL);

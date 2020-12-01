@@ -44,6 +44,7 @@ noinst_LTLIBRARIES =
 
 if CRYPT_DL
   dudders_SOURCES += crypt_dl.c
+  dudders_LDFLAGS += -rpath @plugindir@
 
   crypt_openssl_la_SOURCES = crypt_openssl.c parse_pk.c hope.c
   crypt_gcrypt_la_SOURCES = crypt_gcrypt.c parse_pk.c hope.c
@@ -51,14 +52,14 @@ if CRYPT_DL
 if CRYPT_DL_OPENSSL
     plugin_LTLIBRARIES += crypt_openssl.la
 
-    crypt_openssl_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext .so
+    crypt_openssl_la_LDFLAGS = -module -export-dynamic -avoid-version
     crypt_openssl_la_LDFLAGS += -lcrypto
 endif
 if CRYPT_DL_GCRYPT
     plugin_LTLIBRARIES += crypt_gcrypt.la
 
     crypt_gcrypt_la_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
-    crypt_gcrypt_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext .so
+    crypt_gcrypt_la_LDFLAGS = -module -export-dynamic -avoid-version
     crypt_gcrypt_la_LDFLAGS += $(LIBGCRYPT_LIBS)
 endif
 

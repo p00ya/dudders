@@ -37,6 +37,8 @@ AC_PROG_CC([clang gcc cl cc])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 LT_INIT([dlopen])
+LT_SYS_MODULE_EXT
+
 AS_IF([test "x$ac_cv_prog_cc_stdc" = xno],
   [AC_MSG_FAILURE([get a C99 compliant compiler])])
 
