@@ -33,6 +33,7 @@ AC_DEFINE_UNQUOTED([PLUGIN_DIR], "$plugindir",
 AC_SUBST([plugindir])
 
 # Checks for programs.
+AC_PROG_CC([clang gcc cl cc])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 LT_INIT([dlopen])
