@@ -28,7 +28,7 @@
 
 static void *dl; // dlopen handle
 
-// Pointers to the module's implemntations of the crypt.h functions.
+// Pointers to the module's implementations of the crypt.h functions.
 static void (*crypt_init_impl)();
 static void (*crypt_finish_impl)();
 static void (*crypt_load_key_impl)(FILE *);
