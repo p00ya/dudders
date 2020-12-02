@@ -1,3 +1,10 @@
+Noteworthy changes in dudders-1.05
+
+ - Use "--with-crypto=openssl" by default instead of the dlopen plugin
+   system.
+
+ - Fixes to build with modern versions of OpenSSL and libgcrypt.
+
 Noteworthy changes in dudders-1.04
 
  - The update message can be sent over TCP, with the -T option.
