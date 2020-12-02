@@ -39,6 +39,12 @@ AM_PROG_CC_C_O
 LT_INIT([dlopen])
 LT_SYS_MODULE_EXT
 
+AC_ARG_VAR([OPENSSL_CPPFLAGS],
+  [C preprocessor flags for compiling with OpenSSL, e.g. -I<dir>])
+AC_ARG_VAR([OPENSSL_LDFLAGS],
+  [linker flags for linking against OpenSSL, e.g. -L<dir>])
+
+
 AS_IF([test "x$ac_cv_prog_cc_stdc" = xno],
   [AC_MSG_FAILURE([get a C99 compliant compiler])])
 
@@ -56,7 +62,7 @@ AC_ARG_WITH([dlcrypto],
 AM_CONDITIONAL([CRYPT_DL], [test "x$with_crypto" = "xdl"])
 AM_CONDITIONAL([CRYPT_OPENSSL], [test "x$with_crypto" = "xopenssl"])
 AM_CONDITIONAL([CRYPT_GCRYPT], [test "x$with_crypto" = "xgcrypt"])
-DS_CHECK_CRYPTO([$with_crypto], [],
+DS_CHECK_CRYPTO([$with_crypto], [true do_not_touch_LIBS],
    [AC_MSG_ERROR([crypto package "$with_crypto" unuseable])])
 
 DS_CHECK_DLCRYPTO([$with_dlcrypto],

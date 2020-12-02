@@ -34,6 +34,7 @@ dudders_SOURCES += hope.c
 dudders_SOURCES += dnsupdate.h dnssoa.h dns_send.h
 dudders_SOURCES += hope.h parse_pk.h crypt.h
 dudders_SOURCES += rpl_nameser.h rpl_resolv.h rpl_resolv.c
+dudders_CPPFLAGS =
 dudders_LDADD = @LIBS@
 dudders_LDFLAGS =
 LIBS =
@@ -52,8 +53,9 @@ if CRYPT_DL
 if CRYPT_DL_OPENSSL
     plugin_LTLIBRARIES += crypt_openssl.la
 
+    crypt_openssl_la_CPPFLAGS = $(OPENSSL_CPPFLAGS)
     crypt_openssl_la_LDFLAGS = -module -export-dynamic -avoid-version
-    crypt_openssl_la_LDFLAGS += -lcrypto
+    crypt_openssl_la_LDFLAGS += $(OPENSSL_LDFLAGS) -lcrypto
 endif
 if CRYPT_DL_GCRYPT
     plugin_LTLIBRARIES += crypt_gcrypt.la
@@ -67,11 +69,13 @@ else !CRYPT_DL
   dudders_SOURCES += parse_pk.c
 if CRYPT_OPENSSL
     dudders_SOURCES += crypt_openssl.c
+    dudders_CPPFLAGS += $(OPENSSL_CPPFLAGS)
+    dudders_LDFLAGS += $(OPENSSL_LDFLAGS)
     dudders_LDADD += -lcrypto
 endif
 if CRYPT_GCRYPT
     dudders_SOURCES += crypt_gcrypt.c
-    dudders_CPPFLAGS = $(LIBGCRYPT_CFLAGS)
+    dudders_CPPFLAGS += $(LIBGCRYPT_CFLAGS)
     dudders_LDADD += $(LIBGCRYPT_LIBS)
 endif
 endif !CRYPT_DL

@@ -13,6 +13,26 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+
+# DS_WITH_OPENSSL(ACTION)
+# ----------------------------------
+#
+# Add OPENSSL_CPPFLAGS and OPENSSL_LDFLAGS to CPPFLAGS and LDFLAGS
+# respectively, before ACTION.  After ACTION, CPPFLAGS and LDFLAGS are
+# restored.
+AC_DEFUN([DS_WITH_OPENSSL],[
+AS_IF([test "x$OPENSSL_CPPFLAGS" != "x"],
+  [ds_save_cppflags=${CPPFLAGS}
+  CPPFLAGS="${CPPFLAGS} ${OPENSSL_CPPFLAGS}"])
+AS_IF([test "x$OPENSSL_LDFLAGS" != "x"],
+  [ds_save_ldflags=${LDFLAGS}
+  LDFLAGS="${LDFLAGS} ${OPENSSL_LDFLAGS}"])
+$1
+AS_IF([test "x$OPENSSL_CPPFLAGS" != "x"],[CPPFLAGS=${ds_save_cppflags}])
+AS_IF([test "x$OPENSSL_LDFLAGS" != "x"],[LDFLAGS=${ds_save_ldflags}])
+])
+
+
 # DS_CHECK_CRYPTO(PACKAGE, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 # ------------------------------------------------------------------
 #
@@ -24,7 +44,7 @@ AC_DEFUN([DS_CHECK_CRYPTO],
 [AS_CASE([$1],[dl],
   [LIBS="$lt_cv_dlopen_libs $LIBS"],dnl because we don't use libltdl
   [openssl],
-  [AC_CHECK_LIB([crypto], [RSA_sign], [$2], [$3])],
+  [DS_WITH_OPENSSL([AC_CHECK_LIB([crypto], [RSA_sign], [$2], [$3])])],
   [gcrypt],
   [AM_PATH_LIBGCRYPT([1.2.0], [$2], [$3])],
   [AC_MSG_ERROR([unknown crypto package "$with_crypto"])])
@@ -58,12 +78,13 @@ AS_IF([test "x$with_crypto" = "xdl"],
   ds_save_libs=$LIBS
   for ds_crypto_package in $1 ; do
     AS_CASE(["$ds_crypto_package"],[openssl],
-      [AC_CHECK_LIB([crypto], [RSA_sign],
-       [ds_crypt_dl_openssl=$ds_i
-        AC_DEFINE_UNQUOTED([CRYPT_DL_OPENSSL], [$ds_crypt_dl_openssl],
-         [Define to the priority of the OpenSSL crypto plugin.])
-        ds_i=$(($ds_i+1))],
-       [$2])],
+      [DS_WITH_OPENSSL(
+        [AC_CHECK_LIB([crypto], [RSA_sign],
+         [ds_crypt_dl_openssl=$ds_i
+          AC_DEFINE_UNQUOTED([CRYPT_DL_OPENSSL], [$ds_crypt_dl_openssl],
+           [Define to the priority of the OpenSSL crypto plugin.])
+          ds_i=$(($ds_i+1))],
+         [$2])])],
       [gcrypt],
       [AM_PATH_LIBGCRYPT([1.2.0],
        [ds_crypt_dl_gcrypt=$ds_i

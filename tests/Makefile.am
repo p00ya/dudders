@@ -39,9 +39,13 @@ TESTS += test-crypt-openssl test-sign_query-openssl
 check_PROGRAMS += test-crypt-openssl test-sign_query-openssl
 test_crypt_openssl_SOURCES = $(top_srcdir)/crypt_openssl.c
 test_crypt_openssl_SOURCES += test-crypt.c $(top_srcdir)/parse_pk.c $(top_srcdir)/hope.c test.c
+test_crypt_openssl_CPPFLAGS = $(OPENSSL_CPPFLAGS)
+test_crypt_openssl_LDFLAGS = $(OPENSSL_LDFLAGS)
 test_crypt_openssl_LDADD = -lcrypto
 
 test_sign_query_openssl_SOURCES = $(test_sign_query_SOURCES) $(top_srcdir)/crypt_openssl.c
+test_sign_query_openssl_CPPFLAGS = $(OPENSSL_CPPFLAGS)
+test_sign_query_openssl_LDFLAGS = $(OPENSSL_LDFLAGS)
 test_sign_query_openssl_LDADD = -lcrypto
 endif
 
