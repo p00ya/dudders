@@ -15,8 +15,8 @@ dnl Process this file with autoconf to produce a configure script.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-AC_PREREQ(2.65)
-AC_INIT([dudders], [1.04], [https://github.com/p00ya/dudders])
+AC_PREREQ([2.69])
+AC_INIT([dudders],[1.04],[https://github.com/p00ya/dudders])
 AC_CONFIG_SRCDIR([dudders.c])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

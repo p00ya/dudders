@@ -18,12 +18,11 @@
 #
 # Check that the libraries required for the crypto package PACKAGE are
 # available.
+#
+# `LT_INIT([dlopen])' should be called before `DS_CHECK_CRYPTO'.
 AC_DEFUN([DS_CHECK_CRYPTO],
 [AS_CASE([$1],[dl],
-  [AC_LIBTOOL_DLOPEN
-   AC_PROG_LIBTOOL
-   LIBS="$lt_cv_dlopen_libs $LIBS"dnl because we don't use libltdl
-   ],
+  [LIBS="$lt_cv_dlopen_libs $LIBS"],dnl because we don't use libltdl
   [openssl],
   [AC_CHECK_LIB([crypto], [RSA_sign], [$2], [$3])],
   [gcrypt],
