@@ -51,11 +51,11 @@ AS_IF([test "x$ac_cv_prog_cc_stdc" = xno],
 # Choose some crypto libraries.
 AC_ARG_WITH([crypto],
   [AS_HELP_STRING([--with-crypto=@<:@PACKAGE@:>@],
-    [use PACKAGE for cryptography @<:@default="dl"@:>@])],[],
-  [with_crypto=dl])
+    [use PACKAGE for cryptography @<:@default="openssl"@:>@])],[],
+  [with_crypto=openssl])
 AC_ARG_WITH([dlcrypto],
   [AS_HELP_STRING([--with-dlcrypto=@<:@LIST@:>@],
-    [use the packages in LIST for cryptography @<:@default="openssl gcrypt"@:>@])],
+    [use the plugins in LIST for cryptography @<:@default="openssl gcrypt"@:>@])],
     [],
     [with_dlcrypto="openssl gcrypt"])
 

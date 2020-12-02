@@ -37,40 +37,50 @@ which is included in the file COPYING.
 A POSIX-like standard C library is expected, complete with resolver.
 The BSD, uClibc, and glibc libraries should all work.
 
+### Cryptography dependencies
+
 An external library is required by dudders for cryptography.
 The following packages are supported to provide crypto libraries:
 
  - openssl: The OpenSSL project's libcrypto
  - gcrypt: The GnuPG spinoff crypto library libgcrypt
 
-At runtime dudders will try to dynamically load each of these
-libraries using dlopen(3), until one works.  The behaviour can be
-modified slightly by calling configure with:
-
-```
---with-dlcrypto=LIST
-```
-
-Where LIST is a whitespace separated list containing at least one of
-the packages above, specifying the order they should be tried at
-runtime.  All packages in this list must be available at compile-time
-and at least one at runtime.
-
-To use the system dynamic linker instead of dlopen, call configure
+Specify the crypto library to use at build time by calling configure
 with:
 
 ```
 --with-crypto=PACKAGE
 ```
 
-Where PACKAGE is one of the packages above.  This is less flexible, but
-more portable.
+Alternatively, dudders can build support for both the libraries as
+"plugins".  By calling configure with:
+
+```
+--with-crypto=dl --with-dlcrypto=LIST
+```
+dudders will try to dynamically load each of the plugins using
+dlopen(3), in the order specified by LIST, until one works.  All
+packages in LIST must be available at compile-time and at least one at
+runtime.
+
+For each of the specified plugins, a shared library will be installed
+in the plugin directory (`/usr/local/lib/dudders` by default).  To run
+dudders from the build directory (without running `make install`), you
+will need to add `.libs` in the build directory to dlopen's search
+paths.  The mechanism for this depends on the system's implementation
+of dlopen, but on Linux one can run something like:
+
+```
+LD_LIBRARY_PATH=.libs:$LD_LIBRARY_PATH ./dudders
+```
+
+### Other build options
 
 By default, the program is built with a meagre amount of debugging
 information.  To make it leaner, call configure with:
 
 ```
-CFLAGS="-DNDEBUG -O2"
+CFLAGS="-DNDEBUG -Osize"
 ```
 
 Consult the INSTALL file for additional instructions on building and
