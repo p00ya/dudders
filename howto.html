@@ -31,8 +31,8 @@
     <p>This section explains at a basic level the technologies dudders uses, and why you might want to use dudders.  Skip this section if you already know how DNS UPDATE works.</p>
     <p>A computer on the internet is identified by an <q><acronym title="internet protocol">IP</acronym> address</q>.  For home networks, this address is assigned to a router or modem by an <acronym title="internet service providers">ISP</acronym> (the telecommunications company you pay for internet access).  Many ISPs frequently change the particular IP address they assign to a home connection: this practice is often described as assigning a <q>dynamic IP address</q>.</p>
     <p>You may wish to connect directly to your home network from a remote location: for example, to upload a file to a home server.  Accessing your home network through the internet requires you to know the dynamic IP address assigned by your ISP.  Some ISPs make it available via their websites, or you could write it down, or even just remember it as you leave the house.  However, if your home connection drops temporarily, it's possible the address could change!</p>
-    <p>An IP address is just a number, such as <code>192.0.32.10</code>.  Most people on the internet are used to accessing machines using the Domain Name System.  A type of <acronym title="domain name system">DNS</acronym> record called an <q>A record</q> associates a domain name (e.g. <code>home.dynamic.net</code>) to an IP address.  If you have registered your own domain name (e.g. <code>dynamic.net</code>), it may be convenient to set up a subdomain like "<code>home</code>" to point to your home address.  This is easier to remember than a 4-octet IP address, but it still doesn't solve the problem of being up-to-date.  You need your home modem or router to update the A record whenever your home connection gets a new address.</p>
-    <p>Dudders is a program with a command-line interface that allows your computer (or router) to securely update a domain name to point to a dynamic IP address.  Your home router sends a DNS packet to the DNS server responsible for your domain with your home's new address, whenever your router reconnects to the internet.  This lets you connect to your home computers from anywhere in the world, using an easy-to-remember domain name like <code>home.dynamic.net</code>.</p>
+    <p>An IP address is just a number, such as <code>192.0.32.10</code>.  Most people on the internet are used to accessing machines using the Domain Name System.  A type of <acronym title="domain name system">DNS</acronym> record called an <q>A record</q> associates a domain name (e.g. <code>home&#8203;.dynamic.net</code>) to an IP address.  If you have registered your own domain name (e.g. <code>dynamic.net</code>), it may be convenient to set up a subdomain like "<code>home</code>" to point to your home address.  This is easier to remember than a 4-octet IP address, but it still doesn't solve the problem of being up-to-date.  You need your home modem or router to update the A record whenever your home connection gets a new address.</p>
+    <p>Dudders is a program with a command-line interface that allows your computer (or router) to securely update a domain name to point to a dynamic IP address.  Your home router sends a DNS packet to the DNS server responsible for your domain with your home's new address, whenever your router reconnects to the internet.  This lets you connect to your home computers from anywhere in the world, using an easy-to-remember domain name like <code>home&#8203;.dynamic.net</code>.</p>
     <p>Dudders uses an extension to the DNS protocol that allows a DNS zone to be updated.  This extension, DNS UPDATE, was standardised by the <acronym title="internet engineering taskforce">IETF</acronym>, the same group that publishes the DNS protocol.  The DNS UPDATE extension is secure, efficient, and supported by BIND, one of the most popular DNS server implementations.</p>
     <h2 id="howto">HOWTO</h2>
     <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND.  This HOWTO assumes you have access to that DNS server, and a computer with BIND's tools such as nsupdate and dnssec-keygen.</p>
@@ -41,15 +41,15 @@
     <ul>
       <li>You must use the <code>-T KEY</code> option for SIG(0).</li>
       <li>You must use the <code>RSAMD5</code> algorithm (it must use RSA for SIG(0), and other digest algorithms will not yet work with dudders).  The example uses a 512-bit RSA/MD5 key.</li>
-      <li>You need to name the key like a subdomain of <code>dynamic.net</code>.  This example uses <code>myrouter.dynamic.net.</code></li>
+      <li>You need to name the key like a subdomain of <code>dynamic.net</code>.  This example uses <code>myrouter&#8203;.dynamic.net.</code></li>
     </ul>
     <pre class="command">
 dnssec-keygen -a RSAMD5 -T KEY -n HOST -b 512 myrouter.dynamic.net.
 </pre>
-    <p>This will produce two files, something like <code>Kmyrouter.dynamic.net.+001+32086.key</code> and <code>Kmyrouter.dynamic.net.+001+32086.private</code> (the 32086 part may be different).</p>
+    <p>This will produce two files, something like <code>Kmyrouter&#8203;.dynamic.net&#8203;.+001+32086&#8203;.key</code> and <code>Kmyrouter&#8203;.dynamic.net&#8203;.+001+32086&#8203;.private</code> (the 32086 part may be different).</p>
     <p>You can read about <a href="http://www.isc.org/files/arm96.html#id2550759">generating keys</a> in the BIND manual.</p>
     <h3 id="bind-conf">BIND configuration</h3>
-    <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND on the server <code>ns1.dynamic.net</code>.  The BIND configuration will be in a file similar to <code>/etc/named.conf</code> or <code>/etc/bind/named.conf</code>, or possibly a file included by one of those two.  The <code>zone</code> statement in that file will be similar to:</p>
+    <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND on the server <code>ns1&#8203;.dynamic.net</code>.  The BIND configuration will be in a file similar to <code>/etc/named.conf</code> or <code>/etc/bind/named.conf</code>, or possibly a file included by one of those two.  The <code>zone</code> statement in that file will be similar to:</p>
     <pre class="filecontents bind">
 zone "dynamic.net" IN {
   type master;
@@ -69,7 +69,7 @@ zone "dynamic.net" IN {
 </pre>
     <p>You can read more in the BIND administrator's manual about <a href="http://www.isc.org/files/arm96.html#dynamic_update">dynamic updates</a>.</p>
     <h3 id="zone-conf">Zone configuration</h3>
-    <p>You need to add the A record for your home domain name, and the KEY record for your key to your zone.  The appropriate zone entry for the KEY record is contained in the <code>Kmyrouter.dynamic.net.+001+32086.key</code> generated earlier.  After adding the entries, the file <code>db.dynamic.net</code> should look something like:</p>
+    <p>You need to add the A record for your home domain name, and the KEY record for your key to your zone.  The appropriate zone entry for the KEY record is contained in the <code>Kmyrouter&#8203;.dynamic.net&#8203;.+001+32086&#8203;.key</code> generated earlier.  After adding the entries, the file <code>db&#8203;.dynamic.net</code> should look something like:</p>
 <pre class="filecontents zone">
 $TTL 86400
 dynamic.net.  IN SOA  ns1.dynamic.net. me.dynamic.net. (
