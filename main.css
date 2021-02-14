@@ -1,6 +1,22 @@
-body {
-	width: 40em;
-	padding-left: 100px;
+
+@media only screen and (min-width: 45em) {
+	body {
+		width: 40em;
+		padding-left: 3em;
+	}
+	pre {
+		font-size: smaller;
+	}
+}
+
+@media only screen and (max-width: 44.99em) {
+	body {
+		font-size: 16pt;
+		padding-left: 5%; padding-right: 5%;
+	}
+	li {
+		margin: 10px 0;
+	}
 }
 
 p {
@@ -11,7 +27,6 @@ pre {
 	width: 80en;
 	padding: 1em;
 	border: 1px solid #ccc;
-	font-size: smaller;
 	overflow: auto;
 	white-space: pre-wrap;
 }

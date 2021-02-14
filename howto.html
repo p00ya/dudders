@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="main.css" />
     <meta name="description" content="How to set up a BIND 9 server and dudders on your home router for dynamic DNS updates" />
     <meta name="author" content="Dean Scarff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
     <h1>dudders &mdash; home router HOWTO</h1>
@@ -51,19 +52,19 @@ dnssec-keygen -a RSAMD5 -T KEY -n HOST -b 512 myrouter.dynamic.net.
     <p>Suppose you own the domain <code>dynamic.net</code>, and its DNS is hosted using BIND on the server <code>ns1.dynamic.net</code>.  The BIND configuration will be in a file similar to <code>/etc/named.conf</code> or <code>/etc/bind/named.conf</code>, or possibly a file included by one of those two.  The <code>zone</code> statement in that file will be similar to:</p>
     <pre class="filecontents bind">
 zone "dynamic.net" IN {
-        type master;
-        file "db.dynamic.net";
+  type master;
+  file "db.dynamic.net";
 };
 </pre>
     <p>You should edit the <code>zone</code> statement to include an <code>update-policy</code> statement:</p>
     <pre class="filecontents bind">
 zone "dynamic.net" IN {
-        type master;
-        file "db.dynamic.net";
-<ins>        update-policy {
-                # allow "myrouter" to update the A record of "home"
-                grant myrouter.dynamic.net. name home.dynamic.net. A;
-        };</ins>
+  type master;
+  file "db.dynamic.net";<ins>
+  update-policy {
+    # allow "myrouter" to update the A record of "home"
+    grant myrouter.dynamic.net. name home.dynamic.net. A;
+  };</ins>
 };
 </pre>
     <p>You can read more in the BIND administrator's manual about <a href="http://www.isc.org/files/arm96.html#dynamic_update">dynamic updates</a>.</p>
@@ -71,13 +72,13 @@ zone "dynamic.net" IN {
     <p>You need to add the A record for your home domain name, and the KEY record for your key to your zone.  The appropriate zone entry for the KEY record is contained in the <code>Kmyrouter.dynamic.net.+001+32086.key</code> generated earlier.  After adding the entries, the file <code>db.dynamic.net</code> should look something like:</p>
 <pre class="filecontents zone">
 $TTL 86400
-dynamic.net.         IN SOA  ns1.dynamic.net. me.dynamic.net. (
-                                2010082601 ; serial
-                                86400      ; refresh (1 day)
-                                7200       ; retry (2 hours)
-                                4838400    ; expire (8 weeks)
-                                10800      ; minimum (3 hours)
-                                )
+dynamic.net.  IN SOA  ns1.dynamic.net. me.dynamic.net. (
+  2010082601 ; serial
+  86400      ; refresh (1 day)
+  7200       ; retry (2 hours)
+  4838400    ; expire (8 weeks)
+  10800      ; minimum (3 hours)
+  )
 ; existing NS, MX, A and other records...
 <ins>
 home.dynamic.net.     IN A 127.0.0.2
